@@ -1,0 +1,101 @@
+.panoramaviewer
+  position: relative
+  height: 500px
+  mbc-panorama-image
+    display: block
+    height: inherit
+    background: black
+  mbc-panorama-controls
+    .zoomslider, .zoomin, .zoomout, .moveup, .movedown, .moveleft, .moveright, .movecenter
+      position: absolute
+      opacity: 0.5
+      font-family: 'Glyphicons Halflings'
+      font-style: normal
+      font-weight: normal
+      line-height: 1
+      -webkit-font-smoothing: antialiased
+      &:hover
+        opacity: 0.75
+    .zoomslider
+      top: 20px
+      right: 20px    
+      border-radius: 5px
+      background: rgba(255,255,255,0.5)
+      padding: 10px 0
+      input 
+        writing-mode: bt-lr // IE
+        -webkit-appearance: slider-vertical // webkit
+        width: 40px
+        height: 200px
+    .zoomin, .zoomout
+      bottom: 20px
+      width: 40px
+    .zoomin
+      right: 20px
+    .zoomout
+      right: 60px
+    .moveleft, .movedown, .moveright, .moveup
+      bottom: 20px
+      width: 40px
+    .moveleft
+      left: 20px
+    .movedown
+      left: 60px
+    .moveright
+      left: 100px
+    .moveup
+      left: 60px
+      bottom: 55px
+    .movecenter
+      top: 20px
+      left: 20px
+
+
+.panoramaviewer
+  position: relative
+  height: 500px
+  mbc-panorama-image
+    display: block
+    height: inherit
+    background: black
+  mbc-panorama-controls
+    .zoomslider, .zoomin, .zoomout, .moveup, .movedown, .moveleft, .moveright
+      position: absolute
+      opacity: 0.5
+      font-family: 'Glyphicons Halflings'
+      font-style: normal
+      font-weight: normal
+      line-height: 1
+      -webkit-font-smoothing: antialiased
+      &:hover
+        opacity: 0.75
+    .zoomslider
+      top: 20px
+      right: 20px    
+      border-radius: 5px
+      background: rgba(255,255,255,0.5)
+      padding: 10px 0
+      input 
+        writing-mode: bt-lr // IE
+        -webkit-appearance: slider-vertical // webkit
+        width: 40px
+        height: 200px
+    .zoomin, .zoomout
+      bottom: 20px
+      width: 40px
+    .zoomin
+      right: 20px
+    .zoomout
+      right: 60px
+    .moveleft, .movedown, .moveright, .moveup
+      bottom: 20px
+      width: 40px
+    .moveleft
+      left: 20px
+    .movedown
+      left: 60px
+    .moveright
+      left: 100px
+    .moveup
+      left: 60px
+      bottom: 55px

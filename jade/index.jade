@@ -1,0 +1,59 @@
+doctype
+html(ng-app='panoramaViewerApp')
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title Recorder-Job-Prototyp
+    link(href='styles/styles.css', rel='stylesheet')
+    script(type='text/ng-template', id='panoramaviewer.html')
+      .panoramaviewer(ng-transclude)
+    script(type='text/ng-template', id='panoramacontrols.html')
+      .zoomslider
+        input(ng-model='sliderValue', ng-change='sliderValueChange()', orient='vertical', type='range', min='0', max='100', step='1')
+      button.btn.btn-default.zoomin(ng-click='zoomInClick()') &#x2b; 
+      button.btn.btn-default.zoomout(ng-click='zoomOutClick()') &#x2212;
+      button.btn.btn-default.moveup(ng-click='moveUpClick()') &#xe113;
+      button.btn.btn-default.movedown(ng-click='moveDownClick()') &#xe114;
+      button.btn.btn-default.moveleft(ng-click='moveLeftClick()') &#xe079;
+      button.btn.btn-default.moveright(ng-click='moveRightClick()') &#xe080;
+      button.btn.btn-default.movecenter(ng-click='fitToScreenClick()') &#xe140;
+  body(ng-controller='PanoramaViewerController')
+    h1 MBC Panorama-Viewer Testseite
+    form(role=form)
+      .form-group
+        label
+          | View-Zoom
+          input.form-control(ng-model='image.scale', type="number")
+        label
+          | View-x
+          input.form-control(ng-model='image.position.x', type="number")
+        label
+          | View-y
+          input.form-control(ng-model='image.position.y', type="number")
+        label
+          | Selection-x
+          input.form-control(ng-model='selection.position.x', type="number")
+        label
+          | Selection-y
+          input.form-control(ng-model='selection.position.y', type="number")
+        label
+          | Selection-Width
+          input.form-control(ng-model='selection.size.width', type="number")
+        label
+          | Selection-Height
+          input.form-control(ng-model='selection.size.height', type="number")
+    mbc-panorama-viewer
+      mbc-panorama-image(src='image.src')
+      mbc-panorama-controls(position='image.position', scale='image.scale', min-scale='0.5', max-scale='5')
+      mbc-panorama-selection(position='selection.position', size='selection.size')
+    // libs
+    script(src='lib/angular/angular.js')
+    script(src='lib/kineticjs/kinetic.js')
+    // panoramaviewer scripts
+    script(src='js/angular-panoramaviewer.js')
+    script(src='js/angular-panoramacontrols.js')
+    script(src='js/angular-panoramaselection.js')
+    script(src='js/kinetic-panoramaviewer.js')
+    script(src='js/kinetic-transformcontrolgroup.js')
+    script(src='js/app.js')

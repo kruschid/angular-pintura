@@ -1,0 +1,8 @@
+.sass-cache
+bower_components
+js
+styles
+lib
+node_modules
+index.html
+*.sublime*

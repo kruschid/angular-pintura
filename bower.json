@@ -1,0 +1,18 @@
+{
+  "name": "angular-pintura",
+  "authors": [
+    "Denis Kruschinski <d.kruschinski@hochschule-trier.de>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "angular": "1.2.25",
+    "bootstrap-sass-official": "latest",
+    "kineticjs": "5.1.0"
+  },
+  "exportsOverride":{
+    "bootstrap-sass-official": {
+      "fonts": "assets/fonts/bootstrap/*"
+    },
+    "jquery": {}
+  }
+}
