@@ -5,9 +5,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "angular": "1.2.25",
+    "angular": "1.4.3",
     "bootstrap-sass-official": "latest",
-    "kineticjs": "5.1.0"
+    "paper": "0.9.23"
   },
   "exportsOverride":{
     "bootstrap-sass-official": {

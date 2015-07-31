@@ -24,11 +24,9 @@ module.exports = (grunt) ->
     # coffeescript
     coffee:
       compile:
-        expand: true
-        cwd: 'coffee'
-        src: ['*.coffee']
-        dest: 'js'
-        ext: '.js'
+        files: 
+          'js/app.js': 'coffee/app.coffee'
+          'js/angular-pintura.js': ['coffee/ngp-container.coffee', 'coffee/ngp-image.coffee']
     # grunt sass
     sass:
       dist:

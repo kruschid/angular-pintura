@@ -1,18 +1,19 @@
-panoramaViewerController = ($scope) ->
-  $scope.image =
-    src: 'images/panorama.jpg' 
-    position: 
-      x: -200
-      y: 0
-    scale: 1
-  $scope.selection =
-    position:
-      x: 100
-      y: 50
-    size:
-      width: 200
-      height: 100
+app = angular.module('app', ['ngPintura'])
 
-# register controller
-angular.module('panoramaViewerApp', ['mbcPanoramaViewer'])
-.controller 'PanoramaViewerController', ['$scope', panoramaViewerController]
+app.controller 'PinturaCtrl', ($scope) ->
+  console.log 1234
+
+# panoramaViewerController = ($scope) ->
+#   $scope.image =
+#     src: 'images/panorama.jpg' 
+#     position: 
+#       x: -200
+#       y: 0
+#     scale: 1
+#   $scope.selection =
+#     position:
+#       x: 100
+#       y: 50
+#     size:
+#       width: 200
+#       height: 100
