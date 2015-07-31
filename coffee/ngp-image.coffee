@@ -1,9 +1,9 @@
-module = angular.module('ngPintura', [])
+module = angular.module('ngPintura')
 
 ###*
 # Pintura image
 ###
-module.directive 'ngpImage', (ngpPaper) ->
+module.directive 'ngpImage', ->
   directive =
     require: '^ngpContainer'
     restrict: 'E'
