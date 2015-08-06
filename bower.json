@@ -7,7 +7,7 @@
   "dependencies": {
     "angular": "1.4.3",
     "bootstrap-sass-official": "latest",
-    "paper": "0.9.23"
+    "konva": "0.9.5"
   },
   "exportsOverride":{
     "bootstrap-sass-official": {

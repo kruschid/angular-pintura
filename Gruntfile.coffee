@@ -26,7 +26,7 @@ module.exports = (grunt) ->
       compile:
         files: 
           'js/app.js': 'coffee/app.coffee'
-          'js/angular-pintura.js': ['coffee/ngp-container.coffee', 'coffee/ngp-image.coffee']
+          'js/angular-pintura.js': 'coffee/angular-pintura.coffee' 
     # grunt sass
     sass:
       dist:

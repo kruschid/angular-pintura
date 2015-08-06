@@ -4,35 +4,24 @@ html(ng-app='app')
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
-    title Recorder-Job-Prototyp
+    title angular-pintura demo
     link(href='styles/styles.css', rel='stylesheet')
-    script(type='text/ng-template', id='panoramaviewer.html')
-      .panoramaviewer(ng-transclude)
-    script(type='text/ng-template', id='panoramacontrols.html')
-      .zoomslider
-        input(ng-model='sliderValue', ng-change='sliderValueChange()', orient='vertical', type='range', min='0', max='100', step='1')
-      button.btn.btn-default.zoomin(ng-click='zoomInClick()') &#x2b; 
-      button.btn.btn-default.zoomout(ng-click='zoomOutClick()') &#x2212;
-      button.btn.btn-default.moveup(ng-click='moveUpClick()') &#xe113;
-      button.btn.btn-default.movedown(ng-click='moveDownClick()') &#xe114;
-      button.btn.btn-default.moveleft(ng-click='moveLeftClick()') &#xe079;
-      button.btn.btn-default.moveright(ng-click='moveRightClick()') &#xe080;
-      button.btn.btn-default.movecenter(ng-click='fitToScreenClick()') &#xe140;
+
+    //- script(type='text/ng-template', id='panoramacontrols.html')
+
   body(ng-controller='PinturaCtrl')
     h1 angular-pintura
-    ngp-container
-      ngp-image    
-    //- form(role=form)
-    //-   .form-group
-    //-     label
-    //-       | View-Zoom
-    //-       input.form-control(ng-model='image.scale', type="number")
-    //-     label
-    //-       | View-x
-    //-       input.form-control(ng-model='image.position.x', type="number")
-    //-     label
-    //-       | View-y
-    //-       input.form-control(ng-model='image.position.y', type="number")
+    form(role=form)
+      .form-group
+        label
+          | View-Zoom
+          input.form-control(ng-model='image.scale', type="number")
+        label
+          | View-x
+          input.form-control(ng-model='image.position.x', type="number")
+        label
+          | View-y
+          input.form-control(ng-model='image.position.y', type="number")
     //-     label
     //-       | Selection-x
     //-       input.form-control(ng-model='selection.position.x', type="number")
@@ -45,13 +34,23 @@ html(ng-app='app')
     //-     label
     //-       | Selection-Height
     //-       input.form-control(ng-model='selection.size.height', type="number")
+    ng-pintura(src='image.src', scale='1')
+      .zoomslider
+        input(ng-model='sliderValue', ng-change='sliderValueChange()', orient='vertical', type='range', min='0', max='100', step='1')
+      button.btn.btn-default.zoomin(ng-click='zoomIn()') &#x2b; 
+      button.btn.btn-default.zoomout(ng-click='zoomOut()') &#x2212;
+      button.btn.btn-default.moveup(ng-click='moveUp()') &#xe113;
+      button.btn.btn-default.movedown(ng-click='moveDown()') &#xe114;
+      button.btn.btn-default.moveleft(ng-click='moveLeft()') &#xe079;
+      button.btn.btn-default.moveright(ng-click='moveRight()') &#xe080;
+      button.btn.btn-default.movecenter(ng-click='fitBounds()') &#xe140;
     //- mbc-panorama-viewer
     //-   mbc-panorama-image(src='image.src')
     //-   mbc-panorama-controls(position='image.position', scale='image.scale', min-scale='0.5', max-scale='5')
     //-   mbc-panorama-selection(position='selection.position', size='selection.size')
     // libs
     script(src='lib/angular/angular.js')
-    script(src='lib/paper/paper-full.js')
+    script(src='lib/konva/konva.min.js')
     // panoramaviewer scripts
     script(src='js/angular-pintura.js')
     script(src='js/app.js')
