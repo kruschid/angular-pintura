@@ -27,10 +27,12 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
         shape: undefined
         # konva tween (to fit image within bound)
         tween: undefined
+        tweenAttrs: {}
         # scale boundaries
-        minScale: 0.5
+        borderWhitespace: 50
+        minScale: 0.2
         maxScale: 5
-        scaleStep: 0.1
+        scaleStep: 0.5
         fitScale: (scale) -> Math.min(Math.max(scale, @minScale), @maxScale)
       # indicator object
       indicator = 
@@ -39,7 +41,7 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
         # konva animation
         animation: undefined
       # slider value an conversion functions
-      slider =
+      scope.slider =
         # current slider value
         value: undefined
         # sets slider value by passing scale
@@ -60,6 +62,8 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
         layer = new ngpKonva.Layer()
         image.shape = new ngpKonva.Image
           draggable: true
+        scope.scale ?= image.shape.scaleX()
+        scope.position ?= image.shape.position()
         indicator.shape = new ngpKonva.Rect()
         # create hierarchy
         stage.add(layer)
@@ -89,6 +93,18 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
         # register animation
         indicator.animation = new ngpKonva.Animation(animFn, layer)
 
+      # Adjusts scale bounds to new image size
+      # Computes minimum scale so the whole image fits into stage 
+      adjustScaleBounds = ->
+        # make sure image fits horizontally
+        image.minScale = stage.width()/(image.shape.width()+2*image.borderWhitespace)
+        # if image doesnt fit vertically with new minScale
+        if stage.height() < (image.shape.height()+2*image.borderWhitespace)*image.minScale
+          # compute min scale based on heights of stage and image
+          image.minScale = stage.height()/(image.shape.height()+2*image.borderWhitespace)
+        # half of 
+        #minScale /= 1.5
+
       # changes size of stage according to new element size
       resizeStage = ->
         stage.size
@@ -97,6 +113,7 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
         indicator.shape.position
           x: stage.width()/2
           y: stage.height()/2
+        adjustScaleBounds()
 
       # loads new image and shows loading indicator 
       imageChange = ->
@@ -111,7 +128,8 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
         newImage.destroy()
         indicator.shape.visible(false)
         indicator.animation.stop()
-        layer.draw()
+        adjustScaleBounds()
+        adjust()
 
       # performs zoom to point based on mousewheel event
       mouseWheel = (e) ->
@@ -138,18 +156,58 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
         # perform animation
         adjust()
 
+      # performs zoom to center of stage
+      zoomToCenter = ->
+        # compute center point
+        point =
+          x: stage.width()/2
+          y: stage.height()/2
+        # perform the zoom
+        zoomToPoint(point)
+
+      # applies new position 
+      dragEnd = ->
+        scope.$apply ->
+          scope.position = 
+            x: image.shape.x()/image.shape.scaleX()
+            y: image.shape.y()/image.shape.scaleY()
+
+      # keeps image in viewport
+      keepInView = ->
+        # define viewport bounds
+        bounds =
+          x1: -image.shape.width() + (stage.width()-image.borderWhitespace)/scope.scale
+          y1: -image.shape.height() + (stage.height()-image.borderWhitespace)/scope.scale
+          x2: image.borderWhitespace/scope.scale
+          y2: image.borderWhitespace/scope.scale
+        # keep position  within view bounds
+        scope.position =
+          x: Math.min(Math.max(scope.position.x, bounds.x1), bounds.x2)
+          y: Math.min(Math.max(scope.position.y, bounds.y1), bounds.y2)
+        # center image horizontally if image smaller than viewport
+        if stage.width()/scope.scale >= image.shape.width()+image.borderWhitespace*2
+          # center group/image vertically move half of distance between image width and stage width
+          scope.position.x = (stage.width()/scope.scale - image.shape.width())/2
+        # center image vertically if image smaller than viewport
+        if stage.height()/scope.scale >= image.shape.height()+image.borderWhitespace*2
+          # center group/image vertically move half of distance between image height and stage height
+          scope.position.y = (stage.height()/scope.scale - image.shape.height())/2
+
       # perform animation to new scale and position
       adjust = ->
         # do not run this method if if pos or scale is not a number
-        return if isNaN(scope.position.x) or isNaN(scope.position.y) or isNaN(scope.scale)
+        return if not scope.position or isNaN(scope.position.x) or isNaN(scope.position.y) or isNaN(scope.scale)
+        # keep scale and postion within bounds 
+        scope.scale = image.fitScale(scope.scale)
+        keepInView()
         # if new pos is different from current pos
-        if scope.scale isnt layer.scaleX() or scope.position.x*scope.scale isnt layer.x() or scope.position.y*scope.scale isnt layer.y()
+        if scope.scale isnt image.shape.scaleX() or scope.position.x*scope.scale isnt image.shape.x() or scope.position.y*scope.scale isnt image.shape.y()
           # freeze state and destroy prior animation
           # !!! do not use finish() here, it'll cause adoptation of prior tween state !!
           # at least onFinish will be fired because after pause and destroy the tween is getting started again
           image.tween.pause().destroy() if image.tween
-          # create position tween
-          image.tween = new ngpKonva.Tween
+          # create tween 
+          image.tween = new ngpKonva.Tween  
             x: scope.position.x * scope.scale # multiplication is obligatory because in the new state the image is bigger/smaller
             y: scope.position.y * scope.scale
             scaleX: scope.scale
@@ -160,14 +218,58 @@ module.directive 'ngPintura', (ngpKonva, $window) ->
             onFinish: ->
               # teile angular mit, dass scope modifiziert wurde
               scope.$apply()
-        # start animation
-        image.tween.play()
+          # play
+          image.tween.play()
+
+      # sets slider value from correpsonding scale
+      scaleChange = ->
+        scope.slider.fromScale(scope.scale)
+        adjust()
+
+      # keeps image within bounds
+      scope.fitInView = ->
+        # set scale to min scale
+        scope.scale = image.minScale
+
+      # zooms to sliders new corrisponding scaling
+      scope.sliderChange = ->
+        scope.scale = scope.slider.toScale()
+        zoomToCenter()
+
+      # user clicks move up
+      scope.moveUp = ->
+        scope.position.y += 100
+
+      # user clicks move down
+      scope.moveDown= ->
+        scope.position.y -= 100
+
+      # user clicks move right
+      scope.moveRight = ->
+        scope.position.x -= 100
+
+      # user clicks move left
+      scope.moveLeft = ->
+        scope.position.x += 100
+
+      # user clicks zoom in
+      scope.zoomIn = ->
+        scope.scale += image.scaleStep
+        zoomToCenter()
+
+      # user clicks zoom out
+      scope.zoomOut = ->
+        scope.scale -= image.scaleStep
+        zoomToCenter()
 
       # contructor
       initStage()
       initIndicator()
       scope.$watch('src', imageChange)
+      scope.$watch('position', adjust, true)
+      scope.$watch('scale', scaleChange)
       angular.element($window).on('resize', resizeStage)
+      image.shape.on('dragend', dragEnd)
       image.shape.on('mousewheel', mouseWheel)
       # pass scope into transcluded template
       transcludeFn( scope, (clonedTranscludedTemplate) -> element.append(clonedTranscludedTemplate) )

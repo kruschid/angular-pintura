@@ -4,9 +4,9 @@ app.controller 'PinturaCtrl', ($scope) ->
   $scope.image =
     src: 'images/panorama.jpg' 
     position: 
-      x: -200
-      y: 0
-    scale: 1
+      x: -137.5
+      y: -68
+    scale: 2
 #   $scope.selection =
 #     position:
 #       x: 100

@@ -34,16 +34,16 @@ html(ng-app='app')
     //-     label
     //-       | Selection-Height
     //-       input.form-control(ng-model='selection.size.height', type="number")
-    ng-pintura(src='image.src', scale='1')
+    ng-pintura(src='image.src', scale='image.scale', position='image.position')
       .zoomslider
-        input(ng-model='sliderValue', ng-change='sliderValueChange()', orient='vertical', type='range', min='0', max='100', step='1')
+        input(ng-model='slider.value', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='100', step='1')
       button.btn.btn-default.zoomin(ng-click='zoomIn()') &#x2b; 
       button.btn.btn-default.zoomout(ng-click='zoomOut()') &#x2212;
       button.btn.btn-default.moveup(ng-click='moveUp()') &#xe113;
       button.btn.btn-default.movedown(ng-click='moveDown()') &#xe114;
       button.btn.btn-default.moveleft(ng-click='moveLeft()') &#xe079;
       button.btn.btn-default.moveright(ng-click='moveRight()') &#xe080;
-      button.btn.btn-default.movecenter(ng-click='fitBounds()') &#xe140;
+      button.btn.btn-default.movecenter(ng-click='fitInView()') &#xe140;
     //- mbc-panorama-viewer
     //-   mbc-panorama-image(src='image.src')
     //-   mbc-panorama-controls(position='image.position', scale='image.scale', min-scale='0.5', max-scale='5')
