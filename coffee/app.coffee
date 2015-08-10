@@ -2,15 +2,27 @@ app = angular.module('app', ['ngPintura'])
 
 app.controller 'PinturaCtrl', ($scope) ->
   $scope.image =
-    src: 'images/panorama.jpg' 
+    src: 'images/img1.jpg' 
     position: 
       x: -137.5
       y: -68
-    scale: 2
-#   $scope.selection =
-#     position:
-#       x: 100
-#       y: 50
-#     size:
-#       width: 200
-#       height: 100
+    scaling: 2
+    minScaling: 0.3
+    maxScaling: 6
+    scaleStep: 0.11
+    mwScaleStep: 0.09
+    moveStep: 99
+    fitOnload: true
+
+  $scope.setURLSource1 = ->
+    $scope.image.src = 'images/img1.jpg'
+
+  $scope.setURLSource2 = ->
+    $scope.image.src = 'images/img2.jpg'
+
+  $scope.setObjectSource = ->
+    $scope.image.src = undefined # hides image and show indicator
+    img = new Image()
+    img.onload = -> 
+      $scope.$apply -> $scope.image.src = img
+    img.src = 'images/img3.jpg'

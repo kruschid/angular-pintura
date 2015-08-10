@@ -2,36 +2,37 @@ ng-pintura
   position: relative
   display: block
   width: 100%
-  height: 300px
-
+  height: 600px
+  background: black
   .zoomslider, .zoomin, .zoomout, .moveup, .movedown, .moveleft, .moveright, .movecenter
     position: absolute
-    opacity: 0.5
+    opacity: 0.75
     font-family: 'Glyphicons Halflings'
     font-style: normal
     font-weight: normal
     line-height: 1
     -webkit-font-smoothing: antialiased
     &:hover
-      opacity: 0.75
+      opacity: 1
   .zoomslider
     top: 20px
     right: 20px    
     border-radius: 5px
-    background: rgba(255,255,255,0.5)
+    background: rgba(255,255,255,0.75)
     padding: 10px 0
     input 
       writing-mode: bt-lr // IE
       -webkit-appearance: slider-vertical // webkit
       width: 40px
-      height: 200px
+      height: 160px
   .zoomin, .zoomout
-    bottom: 20px
     width: 40px
   .zoomin
     right: 20px
+    bottom: 55px
   .zoomout
-    right: 60px
+    right: 20px
+    bottom: 20px
   .moveleft, .movedown, .moveright, .moveup
     bottom: 20px
     width: 40px
