@@ -18,35 +18,30 @@ html(ng-app='app')
             button.btn.btn-default.btn-block(type='button', ng-click='setURLSource1()') URL-Source 1
             button.btn.btn-default.btn-block(type='button', ng-click='setURLSource2()') URL-Source 2
             button.btn.btn-default.btn-block(type='button', ng-click='setObjectSource()') Object-Source
+            button.btn.btn-default.btn-block(type='button', ng-click="setSmallImage()") Small-Image
           .form-group: .checkbox: label
             input(type='checkbox', ng-model='image.fitOnload')
             | Fit-on-load
           .form-group
             label
-              | View-Zoom
+              | Scaling
               input.form-control(ng-model='image.scaling', type="number")
-          .form-group 
-            label
-              | View-x
-              input.form-control(ng-model='image.position.x', type="number")
-            label
-              | View-y
-              input.form-control(ng-model='image.position.y', type="number")
-          .form-group
-            label
-              | Min-Scaling
-              input.form-control(ng-model='image.minScaling', type="number", disabled)
             label
               | Max-Scaling
-              input.form-control(ng-model='image.maxScaling', type="number", disabled)
-          .form-group
+              input.form-control(ng-model='image.maxScaling', type="number")
             label
               | Scale-Step
               input.form-control(ng-model='image.scaleStep', type="number")
             label
               | MWheel-Scale-Step
               input.form-control(ng-model='image.mwScaleStep', type="number")
-          .form-group
+          .form-group 
+            label
+              | Position-X
+              input.form-control(ng-model='image.position.x', type="number")
+            label
+              | Position-Y
+              input.form-control(ng-model='image.position.y', type="number")
             label
               | Move-Step
               input.form-control(ng-model='image.moveStep', type="number")
@@ -54,16 +49,15 @@ html(ng-app='app')
           ng-pintura(src='image.src', 
                                scaling='image.scaling', 
                                position='image.position',
-                               min-scaling='image.minScaling',
                                max-scaling='image.maxScaling',
                                scale-step='image.scaleStep',
                                move-step='image.moveStep',
                                mw-scale-step='image.mwScaleStep',
                                fit-onload='image.fitOnload')
             .zoomslider
-              input(ng-model='slider.value', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='100', step='1')
-            button.btn.btn-default.zoomin(ng-click='zoomIn()') &#x2b; 
-            button.btn.btn-default.zoomout(ng-click='zoomOut()') &#x2212;
+              input(ng-model='slider.value', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='100', step='1', ng-disabled='scalingDisabled')
+            button.btn.btn-default.zoomin(ng-click='zoomIn()', ng-disabled='scalingDisabled') &#x2b; 
+            button.btn.btn-default.zoomout(ng-click='zoomOut()', ng-disabled='scalingDisabled') &#x2212;
             button.btn.btn-default.moveup(ng-click='moveUp()') &#xe113;
             button.btn.btn-default.movedown(ng-click='moveDown()') &#xe114;
             button.btn.btn-default.moveleft(ng-click='moveLeft()') &#xe079;

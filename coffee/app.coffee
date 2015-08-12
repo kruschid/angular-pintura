@@ -7,8 +7,7 @@ app.controller 'PinturaCtrl', ($scope) ->
       x: -137.5
       y: -68
     scaling: 2
-    minScaling: 0.3
-    maxScaling: 6
+    maxScaling: 5
     scaleStep: 0.11
     mwScaleStep: 0.09
     moveStep: 99
@@ -26,3 +25,6 @@ app.controller 'PinturaCtrl', ($scope) ->
     img.onload = -> 
       $scope.$apply -> $scope.image.src = img
     img.src = 'images/img3.jpg'
+
+  $scope.setSmallImage = ->
+    $scope.image.src = 'images/trier.png'

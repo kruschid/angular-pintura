@@ -84,7 +84,7 @@ class NGPImage
     @LOADED = 'loaded'
     @node.draggable(true)
     @minScale = 0.5
-    @maxScale = 5
+    @maxScale = 1
     @tween = undefined # Konova.Tween
     @tweenDuration = 0.25
 
@@ -96,8 +96,11 @@ class NGPImage
     if viewport.height < @node.height()*@minScale
       # compute min scale based on heights of stage and image
       @minScale = viewport.height/@node.height()
+    # never 
+    @minScale = Math.min(@minScale, 1)
 
   _fitScale: (scale) ->
+    console.log @maxScale
     Math.min(Math.max(scale, @minScale), @maxScale)
 
   _zoomToPointAttrs: (scale, point) ->
@@ -215,7 +218,6 @@ module.directive 'ngPintura', (ngPintura, $window) ->
       scaling: '='
       position: '='
       fitOnload: '='
-      minScaling: '='
       maxScaling: '='
       scaleStep: '='
       mwScaleStep: '='
@@ -232,6 +234,7 @@ module.directive 'ngPintura', (ngPintura, $window) ->
 
       resizeContainer = ->
         ngPintura.resize(element[0].clientWidth, element[0].clientHeight)
+        setScalingDisabled()
 
       # changes image
       imageChange = -> 
@@ -304,18 +307,23 @@ module.directive 'ngPintura', (ngPintura, $window) ->
         ngPintura.image.zoomToCenter(scale)
         syncScope()
 
+      setScalingDisabled = ->
+        scope.scalingDisabled = ngPintura.image.minScale is ngPintura.image.maxScale
+
       imageLoad = ->
         scope.fitInView() if scope.fitOnload
+        setScalingDisabled()
+        
+      # configure scaling bounds
+      maxScalingChange = ->
+        ngPintura.image.maxScale = scope.maxScaling
+        setScalingDisabled()
 
       # defaults
-      scope.minScaling ?= 0.5
-      scope.maxScaling ?= 5
+      scope.maxScaling ?= 1
       scope.scaleStep ?= 0.4
       scope.mwScaleStep ?= 0.1
       scope.moveStep ?= 100
-      # configure scaling bounds
-      ngPintura.minScale = scope.minScaling
-      ngPintura.maxScale = scope.maxScaling
       # append stage container to current element
       element.append(ngPintura.stage.content)
       # resize stage container
@@ -325,6 +333,7 @@ module.directive 'ngPintura', (ngPintura, $window) ->
       scope.$watch('src', imageChange)
       scope.$watch('position', positionChange, true)
       scope.$watch('scaling', scalingChange)
+      scope.$watch('maxScaling', maxScalingChange)
       ngPintura.image.node.on('dragend', applySyncScope)
       ngPintura.image.node.on('mousewheel', mouseWheel)
       ngPintura.image.node.on(ngPintura.image.LOADED, imageLoad)
