@@ -96,7 +96,7 @@ class NGPImage
     if viewport.height < @node.height()*@minScale
       # compute min scale based on heights of stage and image
       @minScale = viewport.height/@node.height()
-    # never 
+    # never exceed/scale up original image size
     @minScale = Math.min(@minScale, 1)
 
   _fitScale: (scale) ->
@@ -308,7 +308,7 @@ module.directive 'ngPintura', (ngPintura, $window) ->
         syncScope()
 
       setScalingDisabled = ->
-        scope.scalingDisabled = ngPintura.image.minScale is ngPintura.image.maxScale
+        scope.scalingDisabled = ngPintura.image.minScale >= ngPintura.image.maxScale
 
       imageLoad = ->
         scope.fitInView() if scope.fitOnload
@@ -324,6 +324,7 @@ module.directive 'ngPintura', (ngPintura, $window) ->
       scope.scaleStep ?= 0.4
       scope.mwScaleStep ?= 0.1
       scope.moveStep ?= 100
+      scope.fitOnload ?= true
       # append stage container to current element
       element.append(ngPintura.stage.content)
       # resize stage container
