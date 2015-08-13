@@ -1,6 +1,6 @@
 # Angular Pintura
 
-*angular-pintura* is a image viewer based on [AngularJS 1.4](https://angularjs.org/) and [Konva 0.9.5](http://konvajs.github.io/). Check out the demo: [TODO: upload demo]()
+*angular-pintura* is a image viewer based on [AngularJS 1.4](https://angularjs.org/) and [Konva 0.9.5](http://konvajs.github.io/). Check out the [demo-page](http://kruschid.github.io/angular-pintura/).
 ## Installation
 
 Open your terminal, change to project directory and run 
@@ -71,10 +71,10 @@ You can include the style definitions from the file `sass/_panoramacontrols.sass
 
 ### Directive Attributes
 
-As you can see in the example above and on the [demo page](TODO), angular-pintura directive provides some attributes. With these attributes you are able to manipulate the view from your controller.
+As you can see in the example above and on the [demo page](http://kruschid.github.io/angular-pintura/), angular-pintura directive provides some attributes. With these attributes you are able to manipulate the view from your controller.
 
 #### src (string/Image-Object)
-Image-Source. URL-String or `Image`-Object. See [demo page](TODO).
+Image-Source. URL-String or `Image`-Object. See [demo page](http://kruschid.github.io/angular-pintura/).
 
 #### position ({x:number, y:number})
 Sets the current position of image. See example above.
