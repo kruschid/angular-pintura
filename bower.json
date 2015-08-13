@@ -13,6 +13,12 @@
     "bootstrap-sass-official": {
       "fonts": "assets/fonts/bootstrap/*"
     },
-    "jquery": {}
+    "jquery": {},
+    "konva": {
+      "js": ["konva.js", "konva.min.js"]
+    },
+    "angular": {
+      "js": ["angular.js", "angular.min.js"]
+    }
   }
 }
