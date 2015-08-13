@@ -1,0 +1,21 @@
+{
+  "name": "angular-pintura",
+  "authors": [
+    "Denis Kruschinski <d.kruschinski@hochschule-trier.de>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "angular": "1.4.3",
+    "konva": "0.9.5"
+  },
+  "keywords": [
+    "image",
+    "picture",
+    "viewer",
+    "zoom to point",
+  ],
+  "main": [
+    "angular-pintura.js",
+    "angular-pintura.min.js"
+  ]
+}
