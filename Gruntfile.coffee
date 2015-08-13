@@ -51,6 +51,18 @@ module.exports = (grunt) ->
         files: ['js/*', 'styles/*', 'index.html']
         options:
           livereload: true
+    #
+    # Angualr dependency injection annotations
+    ngAnnotate:
+      ngp:
+        files: 
+          'js/angular-pintura.js': 'js/angular-pintura.js'
+    #
+    # Uglify
+    uglify:
+      ngp:
+        files:
+          'js/angular-pintura.min.js': 'js/angular-pintura.js'
 
   grunt.loadNpmTasks('grunt-bower-task')
   grunt.loadNpmTasks('grunt-contrib-jade')
@@ -59,5 +71,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-watch')
   grunt.loadNpmTasks('grunt-contrib-uglify')
   grunt.loadNpmTasks('grunt-contrib-clean')
+  grunt.loadNpmTasks('grunt-ng-annotate')
 
-  grunt.registerTask('build', ['clean', 'bower:install', 'jade', 'coffee', 'sass'])
+  grunt.registerTask('build', ['clean', 'bower:install', 'jade', 'coffee', 'sass', 'ngAnnotate', 'uglify'])

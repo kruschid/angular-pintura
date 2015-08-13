@@ -100,7 +100,6 @@ class NGPImage
     @minScale = Math.min(@minScale, 1)
 
   _fitScale: (scale) ->
-    console.log @maxScale
     Math.min(Math.max(scale, @minScale), @maxScale)
 
   _zoomToPointAttrs: (scale, point) ->
