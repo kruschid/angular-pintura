@@ -12,7 +12,7 @@
     "image",
     "picture",
     "viewer",
-    "zoom to point",
+    "zoom to point"
   ],
   "main": [
     "angular-pintura.js",
