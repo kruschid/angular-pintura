@@ -9,7 +9,7 @@ Open your terminal, change to project directory and run
 
 Or add `"angular-pintura":"latest"` to your list of dependencies in `bower.json` and run `bower install` aufterwards.
 
-	
+  
 ## How to Use
 
 Following examples are written in [Jade](http://jade-lang.com/), [SASS](http://sass-lang.com/) and [CoffeScript](http://coffeescript.org/). Keep in mind that those examples won't work in a pure HTML/JS/CSS-Project without preceding compilation. 
@@ -28,42 +28,42 @@ Assuming your angular-app is in `src/app.js`, you have to add `'ngPintura'` modu
 	app = angular.module('app', ['ngPintura'])
 
 Within your controller you might want to pass some initial params.
-	
+	  
 	$scope.image =
-		src: 'images/img1.jpg'
-		position: 
-			x: -137.5
-			y: -68
-		scaling: 2
+	src: 'images/img1.jpg'
+	position: 
+		x: -137.5
+		y: -68
+	scaling: 2
 
 Now just use the `ng-pintura` directive in your Jade-File:
 
-	ng-pintura(src='image.src', 
-				scaling='image.scaling',
-				position='image.position')
+	ng-pintura(ngp-src='image.src', 
+				ngp-scaling='image.scaling',
+				ngp-position='image.position')
 
 Or in your HTML-File:
-	
-	<ng-pintura src='image.src', 
-				scaling='image.scaling',
-				position='image.position'></ng-pintura>
+	  
+	<ng-pintura ngp-src='image.src', 
+	          ngp-scaling='image.scaling',
+	          ngp-position='image.position'></ng-pintura>
 
 ### Custom Control Elements
 
-You might wonder how to add the control elements (buttons, slider) you saw on the [TODO: demo page](). Since the `ng-pintura` directive uses transclusion you can easily add your own template to define and style your own control elements. 
+You might wonder how to add the control elements (buttons, slider) you saw on the [demo page](http://kruschid.github.io/angular-pintura/). Since the `ng-pintura` directive uses transclusion you can easily add your own template to define and style your own control elements. 
 
 The following Jade template mainly uses predefined classes from [Bootstrap 3](http://getbootstrap.com/):
 
-	ng-pintura(src='image.src', scaling='image.scaling', position='image.position')
-	.zoomslider
-		input(ng-model='slider.value', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='100', step='1', ng-disabled='scalingDisabled')
-		button.btn.btn-default.zoomin(ng-click='zoomIn()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-plus
-		button.btn.btn-default.zoomout(ng-click='zoomOut()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-minus
-		button.btn.btn-default.moveup(ng-click='moveUp()'): span.glyphicon.glyphicon-chevron-up
-		button.btn.btn-default.movedown(ng-click='moveDown()'): span.glyphicon.glyphicon-chevron-down
-		button.btn.btn-default.moveleft(ng-click='moveLeft()'): span.glyphicon.glyphicon-chevron-left
-		button.btn.btn-default.moveright(ng-click='moveRight()'): span.glyphicon.glyphicon-chevron-right
-		button.btn.btn-default.movecenter(ng-click='fitInView()'): span.glyphicon.glyphicon-screenshot
+	ng-pintura(ngp-src='image.src')
+		#zoomslider
+		  input(ng-model='slider.value', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='100', step='1', ng-disabled='scalingDisabled')
+		button.btn.btn-default#zoomin(ng-click='zoomIn()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-plus
+		button.btn.btn-default#zoomout(ng-click='zoomOut()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-minus
+		button.btn.btn-default#moveup(ng-click='moveUp()'): span.glyphicon.glyphicon-chevron-up
+		button.btn.btn-default#movedown(ng-click='moveDown()'): span.glyphicon.glyphicon-chevron-down
+		button.btn.btn-default#moveleft(ng-click='moveLeft()'): span.glyphicon.glyphicon-chevron-left
+		button.btn.btn-default#moveright(ng-click='moveRight()'): span.glyphicon.glyphicon-chevron-right
+		button.btn.btn-default#movecenter(ng-click='fitInView()'): span.glyphicon.glyphicon-screenshot
 
 You can include the style definitions from the file `sass/_panoramacontrols.sass` to your sass file if you like to have the same controls in your project:
 
@@ -73,35 +73,50 @@ You can include the style definitions from the file `sass/_panoramacontrols.sass
 
 As you can see in the example above and on the [demo page](http://kruschid.github.io/angular-pintura/), angular-pintura directive provides some attributes. With these attributes you are able to manipulate the view from your controller.
 
-#### src (string/Image-Object)
-Image-Source. URL-String or `Image`-Object. See [demo page](http://kruschid.github.io/angular-pintura/).
+#### ngp-src (string/Image-Object)
+Image-Source. URL-String, `Image`-Object or `Array` of coords and urls. See [demo page](http://kruschid.github.io/angular-pintura/).
 
-#### position ({x:number, y:number})
+In case of source is an array each element should contain folowing properties:
+
+	x: <Number>
+	y: <Number>
+	url: <String>
+
+#### ngp-position ({x:number, y:number})
 Sets the current position of image. See example above.
 
-#### move-step (number)
+#### ngp-move-step (number)
 **default:100 (pixel)**
+
 The value added to/subtract from position on moveUp/moveDown/moveRight/moveLeft.
 
-#### scaling (number)
+#### ngp-scaling (number)
 Current scaling of image.
 
-#### max-scaling (number)
+#### ngp-max-scaling (number)
 **default: 1 (100%)**
 
 Maximum value for scaling.  
 
-#### scale-step (number)
+#### ngp-scale-step (number)
 **default: 0.2**
+
 The value added to/subtract from scaling on zoomIn/zoomOut.
 
-#### mw-scale-step (number)
+#### ngp-mw-scale-step (number)
 **default: 0.1**
+
 The value added to/subtract from scaling on zoomIn/zoomOut caused by mouse wheel.
 
-#### fit-on-load (boolean)
+#### ngp-fit-on-load (boolean)
 **default: true**
+
 Defines wether the directive should fit the image to view boundswhen a image is ready to display. Not recommend when you want to navigate through a set of similar photos (surveillance pictures) and you are intresseted in a certain image detail. 
+
+#### ngp-progres (number)
+**range: 0 to 1**
+
+Represents loading progress of collage images.
 
 ### Directive Scope
 
