@@ -15,7 +15,8 @@
       scaleStep: 0.11,
       mwScaleStep: 0.09,
       moveStep: 99,
-      fitOnload: true
+      fitOnload: true,
+      progress: 0
     };
     $scope.setURLSource1 = function() {
       return $scope.image.src = 'images/img1.jpg';
@@ -34,8 +35,21 @@
       };
       return img.src = 'images/img3.jpg';
     };
-    return $scope.setSmallImage = function() {
+    $scope.setSmallImage = function() {
       return $scope.image.src = 'images/trier.png';
+    };
+    return $scope.setCollage = function() {
+      return $scope.image.src = [
+        {
+          url: 'images/collage1.jpg',
+          x: 0,
+          y: 0
+        }, {
+          url: 'images/collage2.jpg',
+          x: 1,
+          y: 0
+        }
+      ];
     };
   });
 

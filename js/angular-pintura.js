@@ -1,7 +1,39 @@
 (function() {
-  var NGPCanvas, NGPImage, NGPIndicator, module;
+  var NGPCanvas, NGPImage, NGPImageLoader, NGPIndicator, module,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   module = angular.module('ngPintura', []);
+
+  NGPImageLoader = (function() {
+    function NGPImageLoader(files, loadedCb, progressCb) {
+      var file, _i, _len, _ref;
+      this.files = files != null ? files : [];
+      this.loadedCb = loadedCb;
+      this.progressCb = progressCb;
+      this.onload = __bind(this.onload, this);
+      this.loaded = 0;
+      _ref = this.files;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        file = _ref[_i];
+        file.image = new Image();
+        file.image.onload = this.onload;
+        file.image.src = file.url;
+      }
+    }
+
+    NGPImageLoader.prototype.onload = function() {
+      this.loaded += 1;
+      if (this.progressCb) {
+        this.progressCb(this.loaded / this.files.length);
+      }
+      if (this.loaded >= this.files.length) {
+        return this.loadedCb(this.files);
+      }
+    };
+
+    return NGPImageLoader;
+
+  })();
 
   NGPCanvas = (function() {
     function NGPCanvas() {
@@ -15,6 +47,7 @@
       stageNode.add(layerNode);
       layerNode.add(imageNode);
       layerNode.add(indicatorNode);
+      this.progressCb = void 0;
       this.stage = stageNode;
       this.layer = layerNode;
       this.image = new NGPImage(imageNode);
@@ -46,8 +79,10 @@
         })(this));
       } else if (src instanceof Image) {
         return this.setImage(src);
+      } else if (src instanceof Array) {
+        return this.setCollage(src);
       } else {
-        return console.log('src is not set');
+        return console.log('src is empty or unknown format:', src);
       }
     };
 
@@ -63,6 +98,39 @@
       this.image.node.visible(true);
       this.image.node.parent.draw();
       return this.image.node.fire(this.image.LOADED);
+    };
+
+    NGPCanvas.prototype.setCollage = function(files) {
+      var loaded;
+      loaded = (function(_this) {
+        return function(images) {
+          var image, rowsX, rowsY, tmpLayer, _i, _len;
+          rowsX = 0;
+          rowsY = 0;
+          tmpLayer = new Konva.Layer();
+          for (_i = 0, _len = images.length; _i < _len; _i++) {
+            image = images[_i];
+            rowsX = Math.max(image.x + 1, rowsX);
+            rowsY = Math.max(image.y + 1, rowsY);
+            tmpLayer.add(new Konva.Image({
+              image: image.image,
+              x: image.x * image.image.width,
+              y: image.y * image.image.height
+            }));
+          }
+          return tmpLayer.toImage({
+            x: 0,
+            y: 0,
+            width: rowsX * images[0].image.width,
+            height: rowsY * images[0].image.height,
+            callback: function(image) {
+              _this.setImage(image);
+              return tmpLayer.destroy();
+            }
+          });
+        };
+      })(this);
+      return new NGPImageLoader(files, loaded, this.progressCb);
     };
 
     return NGPCanvas;
@@ -134,7 +202,6 @@
     };
 
     NGPImage.prototype._fitScale = function(scale) {
-      console.log(this.maxScale);
       return Math.min(Math.max(scale, this.minScale), this.maxScale);
     };
 
@@ -257,19 +324,20 @@
    * creates canvas
    */
 
-  module.directive('ngPintura', function(ngPintura, $window) {
+  module.directive('ngPintura', ["ngPintura", "$window", function(ngPintura, $window) {
     var directive;
     return directive = {
       transclude: true,
       scope: {
-        src: '=',
-        scaling: '=',
-        position: '=',
-        fitOnload: '=',
-        maxScaling: '=',
-        scaleStep: '=',
-        mwScaleStep: '=',
-        moveStep: '='
+        src: '=ngpSrc',
+        scaling: '=ngpScaling',
+        position: '=ngpPosition',
+        fitOnload: '=ngpfitOnload',
+        maxScaling: '=ngpMaxScaling',
+        scaleStep: '=ngpScaleStep',
+        mwScaleStep: '=ngpMwScaleStep',
+        moveStep: '=ngpMoveStep',
+        progress: '=ngpProgress'
       },
       link: function(scope, element, attrs, ctrl, transcludeFn) {
         var applySyncScope, imageChange, imageLoad, maxScalingChange, mouseWheel, positionChange, resizeContainer, scalingChange, setScalingDisabled, syncScope;
@@ -290,8 +358,11 @@
           return ngPintura.imageChange(scope.src);
         };
         positionChange = function() {
-          ngPintura.image.node.position(scope.position);
-          return ngPintura.layer.draw();
+          var _ref, _ref1;
+          if (((_ref = scope.position) != null ? _ref.x : void 0) && ((_ref1 = scope.position) != null ? _ref1.y : void 0)) {
+            ngPintura.image.node.position(scope.position);
+            return ngPintura.layer.draw();
+          }
         };
         scalingChange = function() {
           ngPintura.image.node.scale({
@@ -368,6 +439,11 @@
           ngPintura.image.maxScale = scope.maxScaling;
           return setScalingDisabled();
         };
+        ngPintura.progressCb = function(progress) {
+          return scope.$apply(function() {
+            return scope.progress = progress;
+          });
+        };
         if (scope.maxScaling == null) {
           scope.maxScaling = 1;
         }
@@ -398,6 +474,6 @@
         });
       }
     };
-  });
+  }]);
 
 }).call(this);

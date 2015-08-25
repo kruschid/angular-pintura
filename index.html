@@ -17,6 +17,7 @@
             <button type="button" ng-click="setURLSource2()" class="btn btn-default btn-block">URL-Source 2</button>
             <button type="button" ng-click="setObjectSource()" class="btn btn-default btn-block">Object-Source</button>
             <button type="button" ng-click="setSmallImage()" class="btn btn-default btn-block">Small-Image</button>
+            <button type="button" ng-click="setCollage()" class="btn btn-default btn-block">Collage</button>
           </div>
           <div class="form-group">
             <div class="checkbox">
@@ -52,17 +53,20 @@
           </div>
         </form>
         <div class="col-md-10">
-          <ng-pintura src="image.src" scaling="image.scaling" position="image.position" max-scaling="image.maxScaling" scale-step="image.scaleStep" move-step="image.moveStep" mw-scale-step="image.mwScaleStep" fit-onload="image.fitOnload">
-            <div class="zoomslider">
+          <div ng-if="image.progress &amp;&amp; image.progress &lt; 1" class="progress">
+            <div role="progressbar" aria-valuenow="{{image.progress}}" aria-valuemin="0" aria-valuemax="1" style="width:{{image.progress*100}}%" class="progress-bar"></div>
+          </div>
+          <ng-pintura ngp-src="image.src" ngp-scaling="image.scaling" ngp-position="image.position" ngp-max-scaling="image.maxScaling" ngp-scale-step="image.scaleStep" ngp-move-step="image.moveStep" ngp-mw-scale-step="image.mwScaleStep" ngp-fit-onload="image.fitOnload" ngp-progress="image.progress">
+            <div id="zoomslider">
               <input ng-model="slider.value" ng-change="sliderChange()" orient="vertical" type="range" min="0" max="100" step="1" ng-disabled="scalingDisabled">
             </div>
-            <button ng-click="zoomIn()" ng-disabled="scalingDisabled" class="btn btn-default zoomin"><span class="glyphicon glyphicon-plus"></span></button>
-            <button ng-click="zoomOut()" ng-disabled="scalingDisabled" class="btn btn-default zoomout"><span class="glyphicon glyphicon-minus"></span></button>
-            <button ng-click="moveUp()" class="btn btn-default moveup"><span class="glyphicon glyphicon-chevron-up"></span></button>
-            <button ng-click="moveDown()" class="btn btn-default movedown"><span class="glyphicon glyphicon-chevron-down"></span></button>
-            <button ng-click="moveLeft()" class="btn btn-default moveleft"><span class="glyphicon glyphicon-chevron-left"></span></button>
-            <button ng-click="moveRight()" class="btn btn-default moveright"><span class="glyphicon glyphicon-chevron-right"></span></button>
-            <button ng-click="fitInView()" class="btn btn-default movecenter"><span class="glyphicon glyphicon-screenshot"></span></button>
+            <button id="zoomin" ng-click="zoomIn()" ng-disabled="scalingDisabled" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+            <button id="zoomout" ng-click="zoomOut()" ng-disabled="scalingDisabled" class="btn btn-default"><span class="glyphicon glyphicon-minus"></span></button>
+            <button id="moveup" ng-click="moveUp()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-up"></span></button>
+            <button id="movedown" ng-click="moveDown()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-down"></span></button>
+            <button id="moveleft" ng-click="moveLeft()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+            <button id="moveright" ng-click="moveRight()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+            <button id="movecenter" ng-click="fitInView()" class="btn btn-default"><span class="glyphicon glyphicon-screenshot"></span></button>
           </ng-pintura>
         </div>
       </div>
