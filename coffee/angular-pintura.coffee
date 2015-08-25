@@ -1,5 +1,19 @@
 module = angular.module('ngPintura', [])
 
+class NGPImageLoader
+  constructor: (@files = [], @loadedCb, @progressCb) ->
+    @loaded = 0
+    for file in @files
+      file.image = new Image()
+      file.image.onload = @onload
+      file.image.src = file.url
+
+  onload: =>
+    @loaded += 1
+    @progressCb(@loaded/@files.length) if @progressCb
+    @loadedCb(@files) if @loaded >= @files.length
+
+
 class NGPCanvas
   constructor: ->
     # create konva stage and items
@@ -17,7 +31,7 @@ class NGPCanvas
     @image = new NGPImage(imageNode)
     @indicator = new NGPIndicator(indicatorNode)
 
-  resize: (width, height)->
+  resize: (width, height) ->
     @stage.size
       width: width
       height: height
@@ -39,8 +53,10 @@ class NGPCanvas
       ) # fromUrl
     else if src instanceof Image
       @setImage(src)
+    else if typeof src is 'object'
+      @setCollage(src) 
     else
-      console.log 'src is not set'
+      console.log 'src is empty or unknown format:', src
 
   # replaces image by new image and hides indicator
   setImage: (newImage) ->
@@ -54,6 +70,33 @@ class NGPCanvas
     @image.node.visible(true)
     @image.node.parent.draw()
     @image.node.fire(@image.LOADED)
+
+  # 
+  setCollage: (files) ->
+    progress = (progress) =>
+      console.log progress
+    loaded = (images) =>
+      rowsX = 0
+      rowsY = 0
+      tmpLayer = new Konva.Layer()
+      for image in images
+        rowsX = Math.max(image.x+1, rowsX)
+        rowsY = Math.max(image.y+1, rowsY)
+        tmpLayer.add new Konva.Image
+          image: image.image
+          x: image.x*image.image.width
+          y: image.y*image.image.height
+      # create collage as one image
+      tmpLayer.toImage
+        x: 0
+        y: 0
+        width: rowsX*images[0].image.width
+        height: rowsY*images[0].image.height
+        callback: (image) => 
+          @setImage(image)
+          tmpLayer.destroy()
+
+    new NGPImageLoader(files, loaded, progress)
 
 ###
 #
@@ -240,8 +283,9 @@ module.directive 'ngPintura', (ngPintura, $window) ->
         ngPintura.imageChange(scope.src)
 
       positionChange = -> 
-        ngPintura.image.node.position(scope.position)
-        ngPintura.layer.draw()
+        if scope.position?.x and scope.position?.y
+          ngPintura.image.node.position(scope.position)
+          ngPintura.layer.draw()
 
       scalingChange = ->
         ngPintura.image.node.scale

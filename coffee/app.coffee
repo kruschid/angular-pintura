@@ -28,3 +28,17 @@ app.controller 'PinturaCtrl', ($scope) ->
 
   $scope.setSmallImage = ->
     $scope.image.src = 'images/trier.png'
+
+  $scope.setCollage = ->
+    $scope.image.src = [
+      url: 'images/collage1.jpg'
+      x: 0
+      y: 0
+    ,
+      url: 'images/collage2.jpg'
+      x: 1
+      y: 0
+    ]
+
+
+      
