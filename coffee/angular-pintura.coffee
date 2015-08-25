@@ -26,6 +26,7 @@ class NGPCanvas
     layerNode.add(imageNode)
     layerNode.add(indicatorNode)
 
+    @progressCb = undefined
     @stage = stageNode
     @layer = layerNode
     @image = new NGPImage(imageNode)
@@ -53,7 +54,7 @@ class NGPCanvas
       ) # fromUrl
     else if src instanceof Image
       @setImage(src)
-    else if typeof src is 'object'
+    else if src instanceof Array
       @setCollage(src) 
     else
       console.log 'src is empty or unknown format:', src
@@ -73,8 +74,6 @@ class NGPCanvas
 
   # 
   setCollage: (files) ->
-    progress = (progress) =>
-      console.log progress
     loaded = (images) =>
       rowsX = 0
       rowsY = 0
@@ -95,8 +94,8 @@ class NGPCanvas
         callback: (image) => 
           @setImage(image)
           tmpLayer.destroy()
-
-    new NGPImageLoader(files, loaded, progress)
+    # init loading
+    new NGPImageLoader(files, loaded, @progressCb)
 
 ###
 #
@@ -256,14 +255,15 @@ module.directive 'ngPintura', (ngPintura, $window) ->
   directive = 
     transclude: true
     scope:
-      src: '='
-      scaling: '='
-      position: '='
-      fitOnload: '='
-      maxScaling: '='
-      scaleStep: '='
-      mwScaleStep: '='
-      moveStep: '='
+      src: '=ngpSrc'
+      scaling: '=ngpScaling'
+      position: '=ngpPosition'
+      fitOnload: '=ngpfitOnload'
+      maxScaling: '=ngpMaxScaling'
+      scaleStep: '=ngpScaleStep'
+      mwScaleStep: '=ngpMwScaleStep'
+      moveStep: '=ngpMoveStep'
+      progress: '=ngpProgress'
     link: (scope, element, attrs, ctrl, transcludeFn) ->
       # slider value and conversion functions
       scope.slider =
@@ -361,6 +361,10 @@ module.directive 'ngPintura', (ngPintura, $window) ->
       maxScalingChange = ->
         ngPintura.image.maxScale = scope.maxScaling
         setScalingDisabled()
+
+      ngPintura.progressCb = (progress) ->
+        scope.$apply -> 
+          scope.progress = progress
 
       # defaults
       scope.maxScaling ?= 1

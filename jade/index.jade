@@ -26,47 +26,54 @@ html(ng-app='app')
           .form-group
             label
               | Scaling
-              input.form-control(ng-model='image.scaling', type="number")
+              input.form-control(ng-model='image.scaling', type='number')
             label
               | Max-Scaling
-              input.form-control(ng-model='image.maxScaling', type="number")
+              input.form-control(ng-model='image.maxScaling', type='number')
             label
               | Scale-Step
-              input.form-control(ng-model='image.scaleStep', type="number")
+              input.form-control(ng-model='image.scaleStep', type='number')
             label
               | MWheel-Scale-Step
-              input.form-control(ng-model='image.mwScaleStep', type="number")
+              input.form-control(ng-model='image.mwScaleStep', type='number')
           .form-group 
             label
               | Position-X
-              input.form-control(ng-model='image.position.x', type="number")
+              input.form-control(ng-model='image.position.x', type='number')
             label
               | Position-Y
-              input.form-control(ng-model='image.position.y', type="number")
+              input.form-control(ng-model='image.position.y', type='number')
             label
               | Move-Step
-              input.form-control(ng-model='image.moveStep', type="number")
+              input.form-control(ng-model='image.moveStep', type='number')
         .col-md-10
-          ng-pintura(src='image.src', 
-                     scaling='image.scaling', 
-                     position='image.position',
-                     max-scaling='image.maxScaling',
-                     scale-step='image.scaleStep',
-                     move-step='image.moveStep',
-                     mw-scale-step='image.mwScaleStep',
-                     fit-onload='image.fitOnload')
-            .zoomslider
+          .progress(ng-if='image.progress && image.progress < 1')
+            .progress-bar(role='progressbar', 
+                          aria-valuenow='{{image.progress}}', 
+                          aria-valuemin='0', 
+                          aria-valuemax='1', 
+                          style='width:{{image.progress*100}}%')
+          ng-pintura(ngp-src='image.src', 
+                     ngp-scaling='image.scaling', 
+                     ngp-position='image.position',
+                     ngp-max-scaling='image.maxScaling',
+                     ngp-scale-step='image.scaleStep',
+                     ngp-move-step='image.moveStep',
+                     ngp-mw-scale-step='image.mwScaleStep',
+                     ngp-fit-onload='image.fitOnload',
+                     ngp-progress='image.progress')
+            #zoomslider
               input(ng-model='slider.value', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='100', step='1', ng-disabled='scalingDisabled')
-            button.btn.btn-default.zoomin(ng-click='zoomIn()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-plus
-            button.btn.btn-default.zoomout(ng-click='zoomOut()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-minus
-            button.btn.btn-default.moveup(ng-click='moveUp()'): span.glyphicon.glyphicon-chevron-up
-            button.btn.btn-default.movedown(ng-click='moveDown()'): span.glyphicon.glyphicon-chevron-down
-            button.btn.btn-default.moveleft(ng-click='moveLeft()'): span.glyphicon.glyphicon-chevron-left
-            button.btn.btn-default.moveright(ng-click='moveRight()'): span.glyphicon.glyphicon-chevron-right
-            button.btn.btn-default.movecenter(ng-click='fitInView()'): span.glyphicon.glyphicon-screenshot
+            button.btn.btn-default#zoomin(ng-click='zoomIn()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-plus
+            button.btn.btn-default#zoomout(ng-click='zoomOut()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-minus
+            button.btn.btn-default#moveup(ng-click='moveUp()'): span.glyphicon.glyphicon-chevron-up
+            button.btn.btn-default#movedown(ng-click='moveDown()'): span.glyphicon.glyphicon-chevron-down
+            button.btn.btn-default#moveleft(ng-click='moveLeft()'): span.glyphicon.glyphicon-chevron-left
+            button.btn.btn-default#moveright(ng-click='moveRight()'): span.glyphicon.glyphicon-chevron-right
+            button.btn.btn-default#movecenter(ng-click='fitInView()'): span.glyphicon.glyphicon-screenshot
     // libs
-    //- script(src='lib/angular/js/angular.min.js')
-    script(src='lib/angular/js/angular.js')
+    script(src='lib/angular/js/angular.min.js')
+    //- script(src='lib/angular/js/angular.js')
     script(src='lib/konva/js/konva.min.js')
     //- script(src='lib/konva/js/konva.js')
     // panoramaviewer scripts
