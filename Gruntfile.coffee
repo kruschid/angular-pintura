@@ -35,6 +35,14 @@ module.exports = (grunt) ->
         src: ['*.sass']
         dest: 'styles'
         ext: '.css'
+
+    # connect-server
+    connect:
+      #uses_defaults: {}
+      server:
+        options: # Defaults: port = 8000, base = '.'
+          livereload: true
+
     #
     # watch
     watch:
@@ -51,6 +59,7 @@ module.exports = (grunt) ->
         files: ['js/*', 'styles/*', 'index.html']
         options:
           livereload: true
+          #atBegin: true
     #
     # Angualr dependency injection annotations
     ngAnnotate:
@@ -72,5 +81,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-uglify')
   grunt.loadNpmTasks('grunt-contrib-clean')
   grunt.loadNpmTasks('grunt-ng-annotate')
+  grunt.loadNpmTasks('grunt-contrib-connect')
 
   grunt.registerTask('build', ['clean', 'bower:install', 'jade', 'coffee', 'sass', 'ngAnnotate', 'uglify'])
+  grunt.registerTask('default', ['connect', 'watch'])
