@@ -10,7 +10,7 @@ class NGPImageLoader
 
   onload: =>
     @loaded += 1
-    @progressCb(@loaded/@files.length) if @progressCb
+    @progressCb(@loaded / @files.length) if @progressCb
     @loadedCb(@files) if @loaded >= @files.length
 
 
@@ -38,8 +38,8 @@ class NGPCanvas
       height: height
     # keep indicator in center
     @indicator.node.position
-      x: width/2
-      y: height/2
+      x: width / 2
+      y: height / 2
     @image.adjustScaleBounds(@stage.size())
 
   # loads new image and shows loading indicator 
@@ -56,7 +56,7 @@ class NGPCanvas
       @setImage(src)
     else if src instanceof Array
       @setCollage(src) 
-    else
+    else if (window.console)
       console.log 'src is empty or unknown format:', src
 
   # replaces image by new image and hides indicator
@@ -133,11 +133,11 @@ class NGPImage
   adjustScaleBounds: (viewport) ->
     return if not @node.width() or not @node.height()
     # adjust scale bounds
-    @minScale = viewport.width/@node.width()
+    @minScale = viewport.width / @node.width()
     # if image doesnt fit vertically with new minScale
     if viewport.height < @node.height()*@minScale
       # compute min scale based on heights of stage and image
-      @minScale = viewport.height/@node.height()
+      @minScale = viewport.height / @node.height()
     # never exceed/scale up original image size
     @minScale = Math.min(@minScale, 1)
 
@@ -152,8 +152,8 @@ class NGPImage
     imgPoint = @node.getAbsoluteTransform().copy().invert().point(point)
     # set new position: current position minus distance between current scaled point and point with new scale
     attrs =
-      x: (-imgPoint.x + point.x/scaling)*scaling # last multiplication is obligatory because in the new state the image is bigger/smaller
-      y: (-imgPoint.y + point.y/scaling)*scaling
+      x: (-imgPoint.x + point.x / scaling)*scaling # last multiplication is obligatory because in the new state the image is bigger/smaller
+      y: (-imgPoint.y + point.y / scaling)*scaling
       scaleX: scaling
       scaleY: scaling
 
@@ -168,8 +168,8 @@ class NGPImage
 
   _stageCenter: ->
     center = 
-      x: @node.getStage().width()/2
-      y: @node.getStage().height()/2
+      x: @node.getStage().width() / 2
+      y: @node.getStage().height() / 2
 
   # performs zoom to center of stage
   zoomToCenter: (scale) ->
@@ -226,8 +226,8 @@ class NGPImage
     attrs =
       scaleX: @minScale
       scaleY: @minScale
-      x: if imgScaled.width < @node.getStage().width() then (@node.getStage().width()-imgScaled.width)/2 else 0
-      y: if imgScaled.height < @node.getStage().height() then (@node.getStage().height()-imgScaled.height)/2 else 0
+      x: if imgScaled.width < @node.getStage().width() then (@node.getStage().width()-imgScaled.width) / 2 else 0
+      y: if imgScaled.height < @node.getStage().height() then (@node.getStage().height()-imgScaled.height) / 2 else 0
     # do not redeclare tween if current state already equals    
     if attrs.x isnt @node.x() or attrs.y isnt @node.y() or attrs.scaleX isnt @node.scaleX()
       # freeze state and destroy prior animation
@@ -256,23 +256,23 @@ module.directive 'ngPintura', (ngPintura, $window) ->
     transclude: true
     scope:
       src: '=ngpSrc'
-      scaling: '=ngpScaling'
-      position: '=ngpPosition'
-      fitOnload: '=ngpfitOnload'
-      maxScaling: '=ngpMaxScaling'
-      scaleStep: '=ngpScaleStep'
-      mwScaleStep: '=ngpMwScaleStep'
-      moveStep: '=ngpMoveStep'
-      progress: '=ngpProgress'
+      scaling: '=?ngpScaling'
+      position: '=?ngpPosition'
+      fitOnload: '=?ngpFitOnload'
+      maxScaling: '=?ngpMaxScaling'
+      scaleStep: '=?ngpScaleStep'
+      mwScaleStep: '=?ngpMwScaleStep'
+      moveStep: '=?ngpMoveStep'
+      progress: '=?ngpProgress'
     link: (scope, element, attrs, ctrl, transcludeFn) ->
       # slider value and conversion functions
       scope.slider =
         # current slider value
         value: undefined
         # sets slider value by passing scale
-        fromScaling: (scale) -> @value = parseInt(((scale-ngPintura.image.minScale)/(ngPintura.image.maxScale-ngPintura.image.minScale))*100)
+        fromScaling: (scale) -> @value = parseInt(((scale-ngPintura.image.minScale) / (ngPintura.image.maxScale-ngPintura.image.minScale))*100)
         # returns corresponding scale value to current slider value
-        toScaling: -> (ngPintura.image.maxScale-ngPintura.image.minScale) * (@value/100) + ngPintura.image.minScale 
+        toScaling: -> (ngPintura.image.maxScale-ngPintura.image.minScale) * (@value / 100) + ngPintura.image.minScale 
 
       resizeContainer = ->
         ngPintura.resize(element[0].clientWidth, element[0].clientHeight)
