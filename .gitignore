@@ -1,0 +1,8 @@
+.*
+!.gitignore
+bower_components
+node_modules
+js
+lib
+styles
+index.html

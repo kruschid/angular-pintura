@@ -81,7 +81,7 @@
         return this.setImage(src);
       } else if (src instanceof Array) {
         return this.setCollage(src);
-      } else {
+      } else if (window.console) {
         return console.log('src is empty or unknown format:', src);
       }
     };
@@ -330,14 +330,14 @@
       transclude: true,
       scope: {
         src: '=ngpSrc',
-        scaling: '=ngpScaling',
-        position: '=ngpPosition',
-        fitOnload: '=ngpfitOnload',
-        maxScaling: '=ngpMaxScaling',
-        scaleStep: '=ngpScaleStep',
-        mwScaleStep: '=ngpMwScaleStep',
-        moveStep: '=ngpMoveStep',
-        progress: '=ngpProgress'
+        scaling: '=?ngpScaling',
+        position: '=?ngpPosition',
+        fitOnload: '=?ngpFitOnload',
+        maxScaling: '=?ngpMaxScaling',
+        scaleStep: '=?ngpScaleStep',
+        mwScaleStep: '=?ngpMwScaleStep',
+        moveStep: '=?ngpMoveStep',
+        progress: '=?ngpProgress'
       },
       link: function(scope, element, attrs, ctrl, transcludeFn) {
         var applySyncScope, imageChange, imageLoad, maxScalingChange, mouseWheel, positionChange, resizeContainer, scalingChange, setScalingDisabled, syncScope;
