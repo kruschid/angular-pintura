@@ -5,8 +5,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "angular": "1.4.3",
-    "konva": "0.9.5"
+    "angular": "1.5",
+    "konva": "0.11.1"
   },
   "keywords": [
     "image",
