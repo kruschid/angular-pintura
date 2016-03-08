@@ -17,5 +17,6 @@
   "main": [
     "angular-pintura.js",
     "angular-pintura.min.js"
-  ]
+  ],
+  "version": "0.2.0"
 }
