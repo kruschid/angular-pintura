@@ -43,10 +43,11 @@ class NGPCanvas
     @image.adjustScaleBounds(@stage.size())
 
   # loads new image and shows loading indicator 
-  imageChange: (src) ->
+  imageChange: (src, showIndicator) ->
     @image.node.visible(false)
-    @indicator.node.visible(true)
-    @indicator.animation.start()
+    if angular.isUndefined(showIndicator) || showIndicator
+      @indicator.node.visible(true)
+      @indicator.animation.start()
     if typeof src is 'string' 
       Konva.Image.fromURL(src, (newImage) =>
         @setImage(newImage.image())
@@ -262,6 +263,7 @@ module.directive 'ngPintura', (ngPintura, $window) ->
       maxScaling: '=?ngpMaxScaling'
       scaleStep: '=?ngpScaleStep'
       mwScaleStep: '=?ngpMwScaleStep'
+      showIndicator: '=?ngpShowIndicator'
       moveStep: '=?ngpMoveStep'
       progress: '=?ngpProgress'
     link: (scope, element, attrs, ctrl, transcludeFn) ->
@@ -280,7 +282,7 @@ module.directive 'ngPintura', (ngPintura, $window) ->
 
       # changes image
       imageChange = -> 
-        ngPintura.imageChange(scope.src)
+        ngPintura.imageChange(scope.src, scope.showIndicator)
 
       positionChange = -> 
         if scope.position?.x and scope.position?.y
