@@ -145,18 +145,72 @@ class NGPImage
   _fitScale: (scale) ->
     Math.min(Math.max(scale, @minScale), @maxScale)
 
+  rotateByVectorTween: (degrees, callback) ->
+    imgScaled =
+      width: @node.width() * @minScale
+      height: @node.height() * @minScale
+    attrs =
+      offsetY: 0
+      offsetX: 0
+      scaleX: @minScale
+      scaleY: @minScale
+      x: if imgScaled.width < @node.getStage().width() then (@node.getStage().width() - (imgScaled.width)) / 2 else 0
+      y: if imgScaled.height < @node.getStage().height() then (@node.getStage().height() - (imgScaled.height)) / 2 else 0
+    newPos = @node.rotation() + degrees
+    orientationSin = Math.round(Math.sin(newPos * Math.PI / 180))
+    orientationCos = Math.round(Math.cos(newPos * Math.PI / 180))
+    if orientationCos == 1 # ↑
+      attrs.offsetX = 0
+      attrs.offsetY = 0
+    else if orientationCos == -1 # ↓
+      attrs.offsetX = @node.width()
+      attrs.offsetY = @node.height()
+    else if orientationSin == 1 # →
+      attrs.offsetX = @node.width() / 2 - (@node.height() / 2)
+      attrs.offsetY = @node.width() / 2 + @node.height() / 2
+    else if orientationSin == -1 # ←
+      attrs.offsetX = @node.width() / 2 + @node.height() / 2
+      attrs.offsetY = -(@node.width() / 2 - (@node.height() / 2))
+    if newPos != @node.rotation()
+      if @tween
+        @tween.pause().destroy()
+      # create tween
+      @tween = new (Konva.Tween)(angular.extend(attrs,
+        node: @node
+        rotation: newPos
+        duration: 0.1
+        easing: Konva.Easings.EaseOut
+        onFinish: callback))
+      # play
+      return @tween.play()
+    return
+
   _zoomToPointAttrs: (scale, point) ->
-    scaling = @node.scaleX() + scale 
-    # keep scale within bounds 
+    scaling = @node.scaleX() + scale
+    # keep scale within bounds
     scaling = @_fitScale(scaling)
     # translate point to local coordinates
     imgPoint = @node.getAbsoluteTransform().copy().invert().point(point)
     # set new position: current position minus distance between current scaled point and point with new scale
     attrs =
-      x: (-imgPoint.x + point.x / scaling)*scaling # last multiplication is obligatory because in the new state the image is bigger/smaller
-      y: (-imgPoint.y + point.y / scaling)*scaling
       scaleX: scaling
       scaleY: scaling
+    newPos = @node.rotation()
+    orientationSin = Math.round(Math.sin(newPos * Math.PI / 180))
+    orientationCos = Math.round(Math.cos(newPos * Math.PI / 180))
+    if orientationCos == 1 # ↑
+      attrs.x = point.x - (imgPoint.x * scaling)
+      attrs.y = point.y - (imgPoint.y * scaling)
+    else if orientationCos == -1 # ↓
+      attrs.x = point.x - ((@node.width() - (imgPoint.x)) * scaling)
+      attrs.y = point.y - ((@node.height() - (imgPoint.y)) * scaling)
+    else if orientationSin == 1 # →
+      attrs.x = point.x - ((@node.height() - (imgPoint.y)) * scaling) - (@node.offsetX() * scaling)
+      attrs.y = point.y - (imgPoint.x * scaling) + @node.offsetX() * scaling
+    else if orientationSin == -1 # ←
+      attrs.x = point.x - (imgPoint.y * scaling) + @node.offsetY() * scaling
+      attrs.y = point.y - ((@node.width() - (imgPoint.x)) * scaling) - (@node.offsetY() * scaling)
+    attrs
 
   # performs zoom to any point
   zoomToPoint: (scale, point) ->
@@ -345,6 +399,14 @@ module.directive 'ngPintura', (ngPintura, $window) ->
       # user clicks zoom out
       scope.zoomOut = ->
         ngPintura.image.zoomToCenterTween(-scope.scaleStep, applySyncScope)
+
+      # user clicks rotate left
+      scope.rotateLeft = ->
+        ngPintura.image.rotateByVectorTween(-90, applySyncScope);
+
+      # user clicks rotate right
+      scope.rotateRight = ->
+        ngPintura.image.rotateByVectorTween(90, applySyncScope);
 
       # zooms to sliders new corrisponding scaling
       scope.sliderChange = ->
