@@ -299,14 +299,12 @@ class NGPImage
       # play
       @tween.play()
 
-module.service('ngPintura', -> new NGPCanvas())
-
 ###*
 # pintura container
 # creates and shares paperjs scope with child directives
 # creates canvas
 ###
-module.directive 'ngPintura', (ngPintura, $window) ->
+module.directive 'ngPintura', ($window) ->
   directive = 
     transclude: true
     scope:
@@ -321,6 +319,9 @@ module.directive 'ngPintura', (ngPintura, $window) ->
       moveStep: '=?ngpMoveStep'
       progress: '=?ngpProgress'
     link: (scope, element, attrs, ctrl, transcludeFn) ->
+      # initializing Canvas
+      ngPintura = new NGPCanvas()
+
       # slider value and conversion functions
       scope.slider =
         # current slider value
@@ -335,7 +336,7 @@ module.directive 'ngPintura', (ngPintura, $window) ->
         setScalingDisabled()
 
       # changes image
-      imageChange = -> 
+      imageChange = ->
         ngPintura.imageChange(scope.src, scope.showIndicator)
 
       positionChange = -> 
