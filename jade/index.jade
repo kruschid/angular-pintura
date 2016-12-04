@@ -22,7 +22,10 @@ html(ng-app='app')
             button.btn.btn-default.btn-block(type='button', ng-click='setCollage()') Collage
           .form-group: .checkbox: label
             input(type='checkbox', ng-model='image.fitOnload')
-            | Fit-on-load
+            | Fit-onload
+          .form-group: .checkbox: label
+            input(type='checkbox', ng-model='image.showIndicator')
+            | Show-inidcator
           .form-group
             label
               | Scaling
@@ -61,6 +64,7 @@ html(ng-app='app')
                      ngp-move-step='image.moveStep',
                      ngp-mw-scale-step='image.mwScaleStep',
                      ngp-fit-onload='image.fitOnload',
+                     ngp-show-indicator='image.showIndicator',
                      ngp-progress='image.progress')
             include ngp-controls.jade
     // libs

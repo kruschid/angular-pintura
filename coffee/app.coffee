@@ -12,6 +12,7 @@ app.controller 'PinturaCtrl', ($scope) ->
     mwScaleStep: 0.09
     moveStep: 99
     fitOnload: true
+    showIndicator: true
     progress: 0
 
   $scope.setURLSource1 = ->
