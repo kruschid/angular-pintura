@@ -5,18 +5,19 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "angular": "1.5",
-    "konva": "0.11.1"
+    "angular": "1.5.9",
+    "konva": "1.1.0"
   },
   "keywords": [
     "image",
     "picture",
     "viewer",
-    "zoom to point"
+    "zoom to point",
+    "rotate"
   ],
   "main": [
     "angular-pintura.js",
     "angular-pintura.min.js"
   ],
-  "version": "0.2.0"
+  "version": "0.2.1"
 }
