@@ -22,7 +22,14 @@
           <div class="form-group">
             <div class="checkbox">
               <label>
-                <input type="checkbox" ng-model="image.fitOnload">Fit-on-load
+                <input type="checkbox" ng-model="image.fitOnload">Fit-onload
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" ng-model="image.showIndicator">Show-inidcator
               </label>
             </div>
           </div>
@@ -56,7 +63,7 @@
           <div ng-if="image.progress &amp;&amp; image.progress &lt; 1" class="progress">
             <div role="progressbar" aria-valuenow="{{image.progress}}" aria-valuemin="0" aria-valuemax="1" style="width:{{image.progress*100}}%" class="progress-bar"></div>
           </div>
-          <ng-pintura ngp-src="image.src" ngp-scaling="image.scaling" ngp-position="image.position" ngp-max-scaling="image.maxScaling" ngp-scale-step="image.scaleStep" ngp-move-step="image.moveStep" ngp-mw-scale-step="image.mwScaleStep" ngp-fit-onload="image.fitOnload" ngp-progress="image.progress">
+          <ng-pintura ngp-src="image.src" ngp-scaling="image.scaling" ngp-position="image.position" ngp-max-scaling="image.maxScaling" ngp-scale-step="image.scaleStep" ngp-move-step="image.moveStep" ngp-mw-scale-step="image.mwScaleStep" ngp-fit-onload="image.fitOnload" ngp-show-indicator="image.showIndicator" ngp-progress="image.progress">
             <div id="zoomslider">
               <input ng-model="slider.value" ng-change="sliderChange()" orient="vertical" type="range" min="0" max="100" step="1" ng-disabled="scalingDisabled">
             </div>
@@ -67,6 +74,8 @@
             <button id="moveleft" ng-click="moveLeft()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
             <button id="moveright" ng-click="moveRight()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
             <button id="movecenter" ng-click="fitInView()" class="btn btn-default"><span class="glyphicon glyphicon-screenshot"></span></button>
+            <button id="rotateleft" ng-click="rotateLeft()" class="btn btn-default"><strong>&#10226;</strong></button>
+            <button id="rotateright" ng-click="rotateRight()" class="btn btn-default"><strong>&#10227;</strong></button>
           </ng-pintura>
         </div>
       </div>

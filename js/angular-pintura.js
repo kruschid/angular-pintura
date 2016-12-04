@@ -66,10 +66,12 @@
       return this.image.adjustScaleBounds(this.stage.size());
     };
 
-    NGPCanvas.prototype.imageChange = function(src) {
+    NGPCanvas.prototype.imageChange = function(src, showIndicator) {
       this.image.node.visible(false);
-      this.indicator.node.visible(true);
-      this.indicator.animation.start();
+      if (angular.isUndefined(showIndicator) || showIndicator) {
+        this.indicator.node.visible(true);
+        this.indicator.animation.start();
+      }
       if (typeof src === 'string') {
         return Konva.Image.fromURL(src, (function(_this) {
           return function(newImage) {
@@ -81,7 +83,7 @@
         return this.setImage(src);
       } else if (src instanceof Array) {
         return this.setCollage(src);
-      } else {
+      } else if (window.console) {
         return console.log('src is empty or unknown format:', src);
       }
     };
@@ -205,17 +207,77 @@
       return Math.min(Math.max(scale, this.minScale), this.maxScale);
     };
 
+    NGPImage.prototype.rotateByVectorTween = function(degrees, callback) {
+      var attrs, imgScaled, newPos, orientationCos, orientationSin;
+      imgScaled = {
+        width: this.node.width() * this.minScale,
+        height: this.node.height() * this.minScale
+      };
+      attrs = {
+        offsetY: 0,
+        offsetX: 0,
+        scaleX: this.minScale,
+        scaleY: this.minScale,
+        x: imgScaled.width < this.node.getStage().width() ? (this.node.getStage().width() - imgScaled.width) / 2 : 0,
+        y: imgScaled.height < this.node.getStage().height() ? (this.node.getStage().height() - imgScaled.height) / 2 : 0
+      };
+      newPos = this.node.rotation() + degrees;
+      orientationSin = Math.round(Math.sin(newPos * Math.PI / 180));
+      orientationCos = Math.round(Math.cos(newPos * Math.PI / 180));
+      if (orientationCos === 1) {
+        attrs.offsetX = 0;
+        attrs.offsetY = 0;
+      } else if (orientationCos === -1) {
+        attrs.offsetX = this.node.width();
+        attrs.offsetY = this.node.height();
+      } else if (orientationSin === 1) {
+        attrs.offsetX = this.node.width() / 2 - (this.node.height() / 2);
+        attrs.offsetY = this.node.width() / 2 + this.node.height() / 2;
+      } else if (orientationSin === -1) {
+        attrs.offsetX = this.node.width() / 2 + this.node.height() / 2;
+        attrs.offsetY = -(this.node.width() / 2 - (this.node.height() / 2));
+      }
+      if (newPos !== this.node.rotation()) {
+        if (this.tween) {
+          this.tween.pause().destroy();
+        }
+        this.tween = new Konva.Tween(angular.extend(attrs, {
+          node: this.node,
+          rotation: newPos,
+          duration: 0.1,
+          easing: Konva.Easings.EaseOut,
+          onFinish: callback
+        }));
+        return this.tween.play();
+      }
+    };
+
     NGPImage.prototype._zoomToPointAttrs = function(scale, point) {
-      var attrs, imgPoint, scaling;
+      var attrs, imgPoint, newPos, orientationCos, orientationSin, scaling;
       scaling = this.node.scaleX() + scale;
       scaling = this._fitScale(scaling);
       imgPoint = this.node.getAbsoluteTransform().copy().invert().point(point);
-      return attrs = {
-        x: (-imgPoint.x + point.x / scaling) * scaling,
-        y: (-imgPoint.y + point.y / scaling) * scaling,
+      attrs = {
         scaleX: scaling,
         scaleY: scaling
       };
+      newPos = this.node.rotation();
+      orientationSin = Math.round(Math.sin(newPos * Math.PI / 180));
+      orientationCos = Math.round(Math.cos(newPos * Math.PI / 180));
+      if (orientationCos === 1) {
+        attrs.x = point.x - (imgPoint.x * scaling);
+        attrs.y = point.y - (imgPoint.y * scaling);
+      } else if (orientationCos === -1) {
+        attrs.x = point.x - ((this.node.width() - imgPoint.x) * scaling);
+        attrs.y = point.y - ((this.node.height() - imgPoint.y) * scaling);
+      } else if (orientationSin === 1) {
+        attrs.x = point.x - ((this.node.height() - imgPoint.y) * scaling) - (this.node.offsetX() * scaling);
+        attrs.y = point.y - (imgPoint.x * scaling) + this.node.offsetX() * scaling;
+      } else if (orientationSin === -1) {
+        attrs.x = point.x - (imgPoint.y * scaling) + this.node.offsetY() * scaling;
+        attrs.y = point.y - ((this.node.width() - imgPoint.x) * scaling) - (this.node.offsetY() * scaling);
+      }
+      return attrs;
     };
 
     NGPImage.prototype.zoomToPoint = function(scale, point) {
@@ -313,10 +375,6 @@
 
   })();
 
-  module.service('ngPintura', function() {
-    return new NGPCanvas();
-  });
-
 
   /**
    * pintura container
@@ -324,23 +382,25 @@
    * creates canvas
    */
 
-  module.directive('ngPintura', ["ngPintura", "$window", function(ngPintura, $window) {
+  module.directive('ngPintura', ["$window", function($window) {
     var directive;
     return directive = {
       transclude: true,
       scope: {
         src: '=ngpSrc',
-        scaling: '=ngpScaling',
-        position: '=ngpPosition',
-        fitOnload: '=ngpfitOnload',
-        maxScaling: '=ngpMaxScaling',
-        scaleStep: '=ngpScaleStep',
-        mwScaleStep: '=ngpMwScaleStep',
-        moveStep: '=ngpMoveStep',
-        progress: '=ngpProgress'
+        scaling: '=?ngpScaling',
+        position: '=?ngpPosition',
+        fitOnload: '=?ngpFitOnload',
+        maxScaling: '=?ngpMaxScaling',
+        scaleStep: '=?ngpScaleStep',
+        mwScaleStep: '=?ngpMwScaleStep',
+        showIndicator: '=?ngpShowIndicator',
+        moveStep: '=?ngpMoveStep',
+        progress: '=?ngpProgress'
       },
       link: function(scope, element, attrs, ctrl, transcludeFn) {
-        var applySyncScope, imageChange, imageLoad, maxScalingChange, mouseWheel, positionChange, resizeContainer, scalingChange, setScalingDisabled, syncScope;
+        var applySyncScope, imageChange, imageLoad, maxScalingChange, mouseWheel, ngPintura, positionChange, resizeContainer, scalingChange, setScalingDisabled, syncScope;
+        ngPintura = new NGPCanvas();
         scope.slider = {
           value: void 0,
           fromScaling: function(scale) {
@@ -355,7 +415,7 @@
           return setScalingDisabled();
         };
         imageChange = function() {
-          return ngPintura.imageChange(scope.src);
+          return ngPintura.imageChange(scope.src, scope.showIndicator);
         };
         positionChange = function() {
           var _ref, _ref1;
@@ -419,6 +479,12 @@
         };
         scope.zoomOut = function() {
           return ngPintura.image.zoomToCenterTween(-scope.scaleStep, applySyncScope);
+        };
+        scope.rotateLeft = function() {
+          return ngPintura.image.rotateByVectorTween(-90, applySyncScope);
+        };
+        scope.rotateRight = function() {
+          return ngPintura.image.rotateByVectorTween(90, applySyncScope);
         };
         scope.sliderChange = function() {
           var scale;
