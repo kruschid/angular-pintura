@@ -1,6 +1,7 @@
 # Angular Pintura
 
-*angular-pintura* is a image viewer based on [AngularJS 1.4](https://angularjs.org/) and [Konva 0.9.5](http://konvajs.github.io/). Check out the [demo-page](http://kruschid.github.io/angular-pintura/).
+*angular-pintura* is a image viewer based on [AngularJS 1.5](https://angularjs.org/) and [Konva 1.1.0](http://konvajs.github.io/). Check out the [demo-page](http://kruschid.github.io/angular-pintura/).
+
 ## Installation
 
 Open your terminal, change to project directory and run 
@@ -9,12 +10,11 @@ Open your terminal, change to project directory and run
 
 Or add `"angular-pintura":"latest"` to your list of dependencies in `bower.json` and run `bower install` aufterwards.
 
-  
-## How to Use
+## How to use
 
 Following examples are written in [Jade](http://jade-lang.com/), [SASS](http://sass-lang.com/) and [CoffeScript](http://coffeescript.org/). Keep in mind that those examples won't work in a pure HTML/JS/CSS-Project without preceding compilation. 
 
-### Include Dependencies
+### Include dependencies
 
 Since *angular-pintura* is based on [AngularJS](https://angularjs.org/) and [Konva](http://konvajs.github.io/) you have to include those libraries before you include *angular-pintura*.
 
@@ -50,7 +50,7 @@ Or in your HTML-File:
                 ngp-scaling='image.scaling',
                 ngp-position='image.position'></ng-pintura>
 
-### Custom Control Elements
+### Custom control elements
 
 You might wonder how to add the control elements (buttons, slider) you saw on the [demo page](http://kruschid.github.io/angular-pintura/). Since the `ng-pintura` directive uses transclusion you can easily add your own template to define and style your own control elements. 
 
@@ -66,12 +66,14 @@ The following Jade template mainly uses predefined classes from [Bootstrap 3](ht
       button.btn.btn-default#moveleft(ng-click='moveLeft()'): span.glyphicon.glyphicon-chevron-left
       button.btn.btn-default#moveright(ng-click='moveRight()'): span.glyphicon.glyphicon-chevron-right
       button.btn.btn-default#movecenter(ng-click='fitInView()'): span.glyphicon.glyphicon-screenshot
+      button.btn.btn-default#rotateleft(ng-click='rotateLeft()'): strong &#10226;
+      button.btn.btn-default#rotateright(ng-click='rotateRight()'): strong &#10227;
 
 You can include the style definitions from the file `sass/_panoramacontrols.sass` to your sass file if you like to have the same controls in your project:
 
     @import bower_components/angular-pintura/sass/_panoramacontrols
 
-### Directive Attributes
+### Directive attributes
 
 As you can see in the example above and on the [demo page](http://kruschid.github.io/angular-pintura/), angular-pintura directive provides some attributes. With these attributes you are able to manipulate the view from your controller.
 
@@ -164,3 +166,10 @@ Adjusts image `scaling` and `position` so that it fits in view. In cases of smal
 
 #### scalingDisabled (boolean)
 Use `scalingDisabled` to hide/disable your control elements when scaling is not possible. Since *angular-pintura* was made to zoom and pan images it has a `minScale` and `maxScale` properties. While the second can be set by the corresponding attribute (`min-scale`, see above) the first is beeing set automatically everytime the view-container is being resized or a new image loaded. In state of current scaling is equal to `minScale` the image fits the view bounds. But in case of a small image, an image smaller than view bounds, the image is beeing centered within the view because its ugly and usually makes no sense to scale up small images. In this case `minScale` has the value of `1`, the original image size. Additionally if the `maxScale` has been set to the same value it is not possible to change the image scaling and also no need to show scaling controls.
+
+## Grunt commands
+
+**You have to run `npm install` before you use the following commands.**
+
+  * `grunt build` installs bower dependencies and transpiles all sources. You need to run this before you start developing in watch-mode.
+  * `grunt` runs a webserver on http://localhost:8000, detects changed sourcefiles autmoatically and reloads the browser.
