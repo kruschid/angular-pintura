@@ -3,6 +3,7 @@
   "authors": [
     "Denis Kruschinski <d.kruschinski@hochschule-trier.de>"
   ],
+  "version": "0.2.0",
   "license": "MIT",
   "devDependencies": {
     "grunt": "0.4.5",
