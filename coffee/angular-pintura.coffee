@@ -144,7 +144,8 @@ class NGPImage
 
   _fitScale: (scale) ->
     Math.min(Math.max(scale, @minScale), @maxScale)
-
+  
+  # scales picture to minScale and rotates it by degrees
   rotateByVectorTween: (degrees, callback) ->
     imgScaled =
       width: @node.width() * @minScale

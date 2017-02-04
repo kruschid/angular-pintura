@@ -1,6 +1,9 @@
 {
-  "name": "angular-compass",
-  "private": true,
+  "name": "angular-pintura",
+  "authors": [
+    "Denis Kruschinski <d.kruschinski@hochschule-trier.de>"
+  ],
+  "license": "MIT",
   "devDependencies": {
     "grunt": "0.4.5",
     "grunt-bower-task": "0.4.0",
