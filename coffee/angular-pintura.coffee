@@ -17,20 +17,32 @@ class NGPImageLoader
 class NGPCanvas
   constructor: ->
     # create konva stage and items
+    # Stage
+    # -> Layer 
+    #   -> IndicatorRect
+    # -> ImageLayer
+    #   -> HotspotsGroup
+    #   -> Image
     stageNode = new Konva.Stage
       container: angular.element('<div>')[0]
     layerNode = new Konva.Layer()
-    imageNode = new Konva.Image()
     indicatorNode = new Konva.Rect()
+    imageLayerNode = new Konva.Layer()
+    hotspotsNode = new Konva.Group()
+    imageNode = new Konva.Image()
     stageNode.add(layerNode)
-    layerNode.add(imageNode)
     layerNode.add(indicatorNode)
+    stageNode.add(imageLayerNode)
+    imageLayerNode.add(imageNode)
+    imageLayerNode.add(hotspotsNode)
 
     @progressCb = undefined
     @stage = stageNode
     @layer = layerNode
-    @image = new NGPImage(imageNode)
     @indicator = new NGPIndicator(indicatorNode)
+    @imageLayer = new NGPImage(imageLayerNode)
+    @hotspots = hotspotsNode
+    @image = imageNode
 
   resize: (width, height) ->
     @stage.size
@@ -40,7 +52,7 @@ class NGPCanvas
     @indicator.node.position
       x: width / 2
       y: height / 2
-    @image.adjustScaleBounds(@stage.size())
+    @imageLayer.adjustScaleBounds(@stage.size())
 
   # loads new image and shows loading indicator 
   imageChange: (src, showIndicator) ->
@@ -319,6 +331,7 @@ module.directive 'ngPintura', ($window) ->
       showIndicator: '=?ngpShowIndicator'
       moveStep: '=?ngpMoveStep'
       progress: '=?ngpProgress'
+      hotspots: '=?ngpHotspots'
     link: (scope, element, attrs, ctrl, transcludeFn) ->
       # initializing Canvas
       ngPintura = new NGPCanvas()
@@ -428,6 +441,12 @@ module.directive 'ngPintura', ($window) ->
         ngPintura.image.maxScale = scope.maxScaling
         setScalingDisabled()
 
+      hotspotsChange = ->
+        # remove all hotspots
+        ngPintura.hotspots.removeChildren()
+        if scope.hotspots
+          ngPintura.hotspots.add.apply(ngPintura.hotspots, scope.hotspots)
+
       ngPintura.progressCb = (progress) ->
         scope.$apply -> 
           scope.progress = progress
@@ -448,6 +467,7 @@ module.directive 'ngPintura', ($window) ->
       scope.$watch('position', positionChange, true)
       scope.$watch('scaling', scalingChange)
       scope.$watch('maxScaling', maxScalingChange)
+      scope.$watch('hotspots', hotspotsChange)
       ngPintura.image.node.on('dragend', applySyncScope)
       ngPintura.image.node.on('mousewheel', mouseWheel)
       ngPintura.image.node.on(ngPintura.image.LOADED, imageLoad)

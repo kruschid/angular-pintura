@@ -14,7 +14,23 @@ app.controller 'PinturaCtrl', ($scope) ->
     fitOnload: true
     showIndicator: true
     progress: 0
+    hotspots: [
+      new Konva.Ellipse
+        id: '123'
+        x: 100
+        y: 100
+        radius: {
+          x: 100
+          y: 50
+        }
+        fill: 'yellow'
+        stroke: 'black'
+        strokeWidth: 4
+    ]
 
+  $scope.image.hotspots.forEach((hotspot) ->
+    hotspot.on('click', -> console.log 'hotspot click on id = ', @getId())
+  )
   $scope.setURLSource1 = ->
     $scope.image.src = 'images/img1.jpg'
 

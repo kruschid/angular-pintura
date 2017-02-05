@@ -5,10 +5,6 @@ html(ng-app='app')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     title angular-pintura demo
-    link(href='styles/styles.css', rel='stylesheet')
-
-    //- script(type='text/ng-template', id='panoramacontrols.html')
-
   body(ng-controller='PinturaCtrl')
     .container
       h1 angular-pintura
@@ -65,14 +61,6 @@ html(ng-app='app')
                      ngp-mw-scale-step='image.mwScaleStep',
                      ngp-fit-onload='image.fitOnload',
                      ngp-show-indicator='image.showIndicator',
-                     ngp-progress='image.progress')
-            include ngp-controls.jade
-    // libs
-    script(src='lib/angular/js/angular.min.js')
-    //- script(src='lib/angular/js/angular.js')
-    script(src='lib/konva/js/konva.min.js')
-    //- script(src='lib/konva/js/konva.js')
-    // panoramaviewer scripts
-    //- script(src='js/angular-pintura.min.js')
-    script(src='js/angular-pintura.js')
-    script(src='js/app.js')
+                     ngp-progress='image.progress',
+                     ngp-hotspots='image.hotspots')
+            include controls.pug
