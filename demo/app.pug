@@ -24,13 +24,16 @@ html(ng-app='app')
             | Show-Hotspots
           .form-group
             label
-              | Scaling
-              input.form-control(ng-model='image.scaling', type='number')
+              | Scale (absolute)
+              input.form-control(ng-model='config.scale', type='number')
             label
-              | Max-Scaling
-              input.form-control(ng-model='image.maxScaling', type='number')
+              | Relative-Scale (0 to 1)
+              input.form-control(ng-model='config.relativeScale', type='number')
             label
-              | Scale-Step
+              | Max-Scale (absolute)
+              input.form-control(ng-model='config.maxScale', type='number')
+            label
+              | Button-Scale-Step
               input.form-control(ng-model='image.scaleStep', type='number')
             label
               | MWheel-Scale-Step

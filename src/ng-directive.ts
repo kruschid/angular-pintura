@@ -20,6 +20,7 @@ export interface IPinturaConfig{
 
 interface IPinturaDirectiveScope extends angular.IScope{
   config: IPinturaConfig
+  fitInView()
 }
 
 const directive = angular.module('kdPintura', [])
@@ -38,6 +39,15 @@ directive.directive('kdPintura', ($window) => ({
       element.append(transcludedTemplate)
     )
 
+    function syncConfig(){
+      console.log('syncConfig')
+      scope.$apply(()=>{
+        config.relativeScale = NGP.toRelativeScale(canvas)
+        console.log(config.relativeScale)
+        
+      })
+    }
+
     function onResize(){
       canvas.resize({
         width: element[0].clientWidth,
@@ -48,6 +58,12 @@ directive.directive('kdPintura', ($window) => ({
     function changeImage(){
       if(config.src)
         NGP.changeImage(canvas, config.src)
+        .then(fitInView)
+    } // changeImage
+
+    function fitInView(){
+        NGP.fitInViewTween(canvas)
+        .then(syncConfig)
     }
 
     function changeRealtiveScale(){
@@ -69,6 +85,7 @@ directive.directive('kdPintura', ($window) => ({
       canvas.stage.draw()
     }
 
+    scope.fitInView = fitInView
     scope.$watch('config.src', changeImage)
     scope.$watch('config.relativeScale', changeRealtiveScale)
     scope.$watch('config.hotspots', changeHotspots)

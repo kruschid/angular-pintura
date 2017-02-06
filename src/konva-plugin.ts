@@ -35,13 +35,29 @@ export class Canvas {
   }
 }
 
+function fromRelativeScale(canvas:Canvas, relativeScale:number):number{
+  // time = relativeScale, wich is in range of [0,1]
+  const t = relativeScale
+  const b = canvas.minScale
+  const c = canvas.maxScale
+  //return -c * (Math.sqrt(1 - t*t) - 1) + b
+  return c*t*t+b
+}
+
+export function toRelativeScale(canvas:Canvas):number{
+  const b = canvas.minScale
+  const c = canvas.maxScale
+  const s = canvas.rootLayer.scaleX()
+  return Math.sqrt(Math.abs((s-b)/c))
+}
+
 function resize(canvas:Canvas, s:{width:number, height:number}){
   console.log('Canvas: resizing to', s) 
   canvas.stage.setSize(s)
 }
 
-export function changeImage(canvas:Canvas, src){
-  loadImage(canvas,src).then((img)=>{
+export function changeImage(canvas:Canvas, src):Promise<any>{
+  return loadImage(canvas,src).then((img)=>{
     canvas.image.image(img)
     adjustScaleBounds(canvas)
     // fit in view
@@ -133,13 +149,43 @@ function zoomToPointTween(canvas: Canvas, scale, point):Promise<any>{
   })
 }
 
-function fromRelativeScale(canvas:Canvas, relativeScale:number):number{
-  // time = relativeScale, with is in range of [0,1]
-  const t = relativeScale
-  const b = canvas.minScale
-  const c = canvas.maxScale
-  //console.log('fromRelativeScale:',canvas.maxScale*t + canvas.minScale);
-  return -c * (Math.sqrt(1 - t*t) - 1) + b
-  // quartic easing in
-  // return canvas.maxScale*t*t + canvas.minScale
+function fitInViewAttributes(canvas:Canvas){
+  const imgScaled = {
+    width: canvas.image.width()*canvas.minScale,
+    height: canvas.image.height()*canvas.minScale
+  } // imgScaled
+  const attributes = {
+    scaleX: canvas.minScale,
+    scaleY: canvas.minScale,
+    x: 0,
+    y: 0
+  }
+  // center image horizontally/vertically
+  if(imgScaled.width < canvas.stage.width())
+    attributes.x = (canvas.stage.width()-imgScaled.width)/2
+  else
+    attributes.y = (canvas.stage.height()-imgScaled.height)/2
+  return attributes
 }
+
+export function fitInViewTween(canvas:Canvas):Promise<any> {
+  return new Promise((resolve, reject) =>{
+    const attrs = fitInViewAttributes(canvas)
+    const nothingToDo = ( attrs.x === canvas.rootLayer.x()
+      || attrs.y === canvas.rootLayer.y()
+      || attrs.scaleX == canvas.rootLayer.scaleX())
+    if(nothingToDo){
+      reject()
+    } else {
+      if(canvas.tween)
+        canvas.tween.pause().destroy()
+      canvas.tween = new Konva.Tween(Object.assign({}, attrs,{
+        node: canvas.rootLayer,
+        duration: canvas.tweenDuration,
+        easing: Konva.Easings.EaseOut,
+        onFinish: resolve
+      }))
+      canvas.tween.play()
+    }
+  }) // Promise
+} // fitInViewTween
