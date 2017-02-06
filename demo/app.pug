@@ -46,21 +46,6 @@ html(ng-app='app')
               | Move-Step
               input.form-control(ng-model='image.moveStep', type='number')
         .col-md-10
-          .progress(ng-if='image.progress && image.progress < 1')
-            .progress-bar(role='progressbar', 
-                          aria-valuenow='{{image.progress}}', 
-                          aria-valuemin='0', 
-                          aria-valuemax='1', 
-                          style='width:{{image.progress*100}}%')
-          ng-pintura(ngp-src='image.src', 
-                     ngp-scaling='image.scaling', 
-                     ngp-position='image.position',
-                     ngp-max-scaling='image.maxScaling',
-                     ngp-scale-step='image.scaleStep',
-                     ngp-move-step='image.moveStep',
-                     ngp-mw-scale-step='image.mwScaleStep',
-                     ngp-fit-onload='image.fitOnload',
-                     ngp-show-indicator='image.showIndicator',
-                     ngp-progress='image.progress',
-                     ngp-hotspots='image.hotspots')
+          | {{config.relativeScale}}
+          kd-pintura(kdp-config='config')
             include controls.pug

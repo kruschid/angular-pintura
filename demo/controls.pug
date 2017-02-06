@@ -1,5 +1,5 @@
 #zoomslider
-  input(ng-model='slider.value', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='100', step='1', ng-disabled='scalingDisabled')
+  input(ng-model='config.relativeScale', ng-change='sliderChange()', orient='vertical', type='range', min='0', max='1', step='0.1', ng-disabled='scalingDisabled')
 button.btn.btn-default#zoomin(ng-click='zoomIn()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-plus
 button.btn.btn-default#zoomout(ng-click='zoomOut()', ng-disabled='scalingDisabled'): span.glyphicon.glyphicon-minus
 button.btn.btn-default#moveup(ng-click='moveUp()'): span.glyphicon.glyphicon-chevron-up
