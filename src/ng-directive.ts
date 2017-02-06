@@ -15,6 +15,7 @@ export interface IPinturaConfig{
   moveStep?: number
   progress?: number
   hotspots?: Konva.Shape[]
+  showHotspots?: boolean
 }
 
 interface IPinturaDirectiveScope extends angular.IScope{
@@ -54,8 +55,24 @@ directive.directive('kdPintura', ($window) => ({
         NGP.zoomToCenterTween(canvas, config.relativeScale)
     }
 
+    function changeHotspots(){
+      if(config.hotspots)
+        canvas.hotspotsGroup.removeChildren()
+        canvas.hotspotsGroup.add.apply(
+          canvas.hotspotsGroup, 
+          config.hotspots
+        )
+    }
+
+    function changeHotspotsVisbility(){
+      canvas.hotspotsGroup.visible(config.showHotspots)
+      canvas.stage.draw()
+    }
+
     scope.$watch('config.src', changeImage)
     scope.$watch('config.relativeScale', changeRealtiveScale)
+    scope.$watch('config.hotspots', changeHotspots)
+    scope.$watch('config.showHotspots', changeHotspotsVisbility)
     onResize()
   } 
 }))

@@ -6,11 +6,12 @@ export class Canvas {
   stage = new Konva.Stage({
     container: document.createElement('div')
   })
-  rootLayer= new Konva.Layer()
+  rootLayer= new Konva.Layer({
+    draggable: true
+  })
   hotspotsGroup = new Konva.Group()
   image= new Konva.Image({
-    image: new Image(),
-    draggable: true
+    image: new Image()
   })
   isLoading: boolean
   minScale = 1
@@ -23,13 +24,12 @@ export class Canvas {
   constructor(private debug:boolean = true) {
     this.stage.add(this.rootLayer)
     this.rootLayer
-      .add(this.hotspotsGroup)
       .add(this.image)
+      .add(this.hotspotsGroup)
   }
 
   public resize(s:{width:number, height:number}){
-    if(this.debug) 
-      console.log('Canvas: resizing to', s)   
+    console.log('Canvas: resizing to', s)   
     this.stage.setSize(s)
     // adjust scale bounds
   }
@@ -72,7 +72,7 @@ function adjustScaleBounds(canvas:Canvas){
 
 function zoomToPointAttributes(canvas: Canvas, scale, point){
   // translate point to local coordinates
-  const imgTransform = canvas.image.getAbsoluteTransform().copy()
+  const imgTransform = canvas.rootLayer.getAbsoluteTransform().copy()
   imgTransform.invert()
   const imgPoint = imgTransform.point(point) 
   // 
@@ -85,24 +85,31 @@ function zoomToPointAttributes(canvas: Canvas, scale, point){
 }
 
 export function zoomToCenterTween(canvas: Canvas, relativeScale):Promise<any>{
-  console.log(`zoomToCenterTween(${canvas}, ${relativeScale})`)
+  console.log('zoomToCenterTween', canvas, relativeScale)
   const center = {
     x: canvas.stage.width() / 2,
     y: canvas.stage.height() / 2
   }
-  return zoomToPointTween(canvas, relativeScale, center)
+  const scale = fromRelativeScale(canvas, relativeScale)
+  return zoomToPointTween(canvas, scale, center)
 }
 
-function zoomToPointTween(canvas: Canvas, relScale, point):Promise<any>{
-  console.log('zoomToCenterTween: ', canvas, relScale, point)
+export function zoomToPointerTween(canvas: Canvas, relativeScale):Promise<any>{
+  console.log('zoomToPointerTween', canvas, relativeScale)
+  const scale = fromRelativeScale(canvas, relativeScale)
+  const point = canvas.stage.getPointerPosition()
+  return zoomToPointTween(canvas, scale, point)
+}
+
+function zoomToPointTween(canvas: Canvas, scale, point):Promise<any>{
+  console.log('zoomToCenterTween: ', canvas, scale, point)
   return new Promise((resolve, reject)=>{
-    const scale = fromRelativeScale(canvas, relScale)
     console.log('scale:', scale)
     const tweenAttrs = zoomToPointAttributes(canvas, scale, point)
     // exit when nothing to do (curr state matches the attributes)
-    const nothingToDo = ( scale === canvas.image.scaleX()
-      || tweenAttrs.x === canvas.image.x()
-      || tweenAttrs.y === canvas.image.y() )
+    const nothingToDo = ( scale === canvas.rootLayer.scaleX()
+      || tweenAttrs.x === canvas.rootLayer.x()
+      || tweenAttrs.y === canvas.rootLayer.y() )
     if(nothingToDo){
       reject()
     } // if
@@ -116,7 +123,7 @@ function zoomToPointTween(canvas: Canvas, relScale, point):Promise<any>{
         canvas.tween.pause().destroy() 
       }
       canvas.tween = new Konva.Tween( Object.assign({}, tweenAttrs, {
-        node: canvas.image,
+        node: canvas.rootLayer,
         duration: canvas.tweenDuration,
         easing: Konva.Easings.EaseOut,
         onFinish: resolve
