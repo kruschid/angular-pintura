@@ -49,6 +49,5 @@ html(ng-app='app')
               | Move-Step
               input.form-control(ng-model='image.moveStep', type='number')
         .col-md-10
-          | {{config.relativeScale}}
           kd-pintura(kdp-config='config')
             include controls.pug

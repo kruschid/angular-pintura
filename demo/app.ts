@@ -26,4 +26,12 @@ app.controller('PinturaCtrl', ($scope) => {
   });
   $scope.config = config
 
+  $scope.setURLSource1 = () =>
+    $scope.config.src = require('file-loader!./images/img1.jpg')
+  
+  $scope.setURLSource2 = () =>
+    $scope.config.src = require('file-loader!./images/img2.jpg')
+  
+  $scope.setSmallImage = () =>
+    $scope.config.src = require('file-loader!./images/trier.png')
 })

@@ -2,7 +2,7 @@
 import * as Konva from 'konva'
 import * as angular from 'angular'
 
-export class Canvas {
+export class State {
   stage = new Konva.Stage({
     container: document.createElement('div')
   })
@@ -14,58 +14,86 @@ export class Canvas {
     image: new Image()
   })
   isLoading: boolean
-  minScale = 1
-  maxScale = 5
-  relativeScale: number // 0 to 1
-  rotation: number
+  minScale:number = 1
+  maxScale:number = 3
+  rotation: number = 0
   tween: Konva.Tween
-  tweenDuration: number = 0.25
+  tweenDuration = 0.25
+  fitImageOnload = true
+  zoomStep = 0.1
+  mwZoomStep = 0.01
 
-  constructor(private debug:boolean = true) {
+  constructor(private notifier:(state:State)=>void) {
     this.stage.add(this.rootLayer)
     this.rootLayer
       .add(this.image)
       .add(this.hotspotsGroup)
   }
 
-  public resize(s:{width:number, height:number}){
-    console.log('Canvas: resizing to', s)   
-    this.stage.setSize(s)
-    // adjust scale bounds
+  public notify(){
+    this.notifier(this)
   }
 }
 
-function fromRelativeScale(canvas:Canvas, relativeScale:number):number{
+function fromRelativeScale(state:State, relativeScale:number):number{
   // time = relativeScale, wich is in range of [0,1]
-  const t = relativeScale
-  const b = canvas.minScale
-  const c = canvas.maxScale
-  //return -c * (Math.sqrt(1 - t*t) - 1) + b
+  const t = Math.max(Math.min(relativeScale,1), 0)
+  const b = state.minScale
+  const c = state.maxScale - state.minScale
+  // return -c * (Math.sqrt(1 - t*t) - 1) + b
   return c*t*t+b
 }
 
-export function toRelativeScale(canvas:Canvas):number{
-  const b = canvas.minScale
-  const c = canvas.maxScale
-  const s = canvas.rootLayer.scaleX()
+export function toRelativeScale(state:State):number{
+  const b = state.minScale
+  const c = state.maxScale - state.minScale
+  const s = state.rootLayer.scaleX()
+  // return Math.sqrt(Math.pow((s-c-b)/-c,2)+1)
   return Math.sqrt(Math.abs((s-b)/c))
 }
 
-function resize(canvas:Canvas, s:{width:number, height:number}){
-  console.log('Canvas: resizing to', s) 
-  canvas.stage.setSize(s)
+export function resize(state:State, s:{width:number, height:number}){
+  console.log('State: resizing to', s) 
+  state.stage.setSize(s)
+  adjustScaleBounds(state)
 }
 
-export function changeImage(canvas:Canvas, src):Promise<any>{
-  return loadImage(canvas,src).then((img)=>{
-    canvas.image.image(img)
-    adjustScaleBounds(canvas)
-    // fit in view
-  })
+export function changeImage(state:State, src):Promise<any>{
+  return loadImage(state,src)
+    .then((img)=>{
+      state.image.image(img)
+      adjustScaleBounds(state)
+      if(state.fitImageOnload){
+        return fitInView(state)
+      }else{
+        state.notify()
+      }
+    })
 }
 
-function loadImage(canvas:Canvas, src):Promise<any>{ 
-  console.log('Canvas: loading image', src)
+export function fitInView(state:State):Promise<any>{
+  return fitInViewTween(state)
+    .then(()=> state.notify())
+}
+
+export function zoomToCenter(state:State, relativeScale):Promise<any>{
+  const scale = fromRelativeScale(state, relativeScale)
+  return zoomToCenterTween(state, scale)
+    .then(()=> state.notify())
+}
+
+export function zoomIn(state:State):Promise<any>{
+  const relScale = toRelativeScale(state) + state.zoomStep
+  return zoomToCenter(state, relScale)
+}
+
+export function zoomOut(state:State):Promise<any>{
+  const relScale = toRelativeScale(state) - state.zoomStep
+  return zoomToCenter(state, relScale)
+}
+
+function loadImage(state:State, src):Promise<any>{ 
+  console.log('State: loading image', src)
   return new Promise((resolve)=> {
     const img = new Image()
     img.onload = () => resolve(img)
@@ -73,22 +101,22 @@ function loadImage(canvas:Canvas, src):Promise<any>{
   })
 }
 
-function adjustScaleBounds(canvas:Canvas){
+function adjustScaleBounds(state:State){
   console.log('adjusting scale bounds')
   // lets try by adjusting by width
-  let minScale = canvas.stage.width() / canvas.image.width()
+  let minScale = state.stage.width() / state.image.width()
   // image doesnt fit vertically with the prior adjustment
-  if(canvas.stage.height() < canvas.image.height()*minScale){
+  if(state.stage.height() < state.image.height()*minScale){
     // then adjust by height
-    minScale = canvas.stage.height() / canvas.image.height()
+    minScale = state.stage.height() / state.image.height()
   }
   // never scale up original image size
-  canvas.minScale = Math.min(minScale, 1)
+  state.minScale = Math.min(minScale, 1)
 }
 
-function zoomToPointAttributes(canvas: Canvas, scale, point){
+function zoomToPointAttributes(state: State, scale, point){
   // translate point to local coordinates
-  const imgTransform = canvas.rootLayer.getAbsoluteTransform().copy()
+  const imgTransform = state.rootLayer.getAbsoluteTransform().copy()
   imgTransform.invert()
   const imgPoint = imgTransform.point(point) 
   // 
@@ -100,92 +128,86 @@ function zoomToPointAttributes(canvas: Canvas, scale, point){
   }
 }
 
-export function zoomToCenterTween(canvas: Canvas, relativeScale):Promise<any>{
-  console.log('zoomToCenterTween', canvas, relativeScale)
+function zoomToCenterTween(state: State, scale:number):Promise<any>{
+  console.log('zoomToCenterTween', state, scale)
   const center = {
-    x: canvas.stage.width() / 2,
-    y: canvas.stage.height() / 2
+    x: state.stage.width() / 2,
+    y: state.stage.height() / 2
   }
-  const scale = fromRelativeScale(canvas, relativeScale)
-  return zoomToPointTween(canvas, scale, center)
+  return zoomToPointTween(state, scale, center)
 }
 
-export function zoomToPointerTween(canvas: Canvas, relativeScale):Promise<any>{
-  console.log('zoomToPointerTween', canvas, relativeScale)
-  const scale = fromRelativeScale(canvas, relativeScale)
-  const point = canvas.stage.getPointerPosition()
-  return zoomToPointTween(canvas, scale, point)
+function zoomToPointerTween(state: State, relativeScale):Promise<any>{
+  console.log('zoomToPointerTween', state, relativeScale)
+  const scale = fromRelativeScale(state, relativeScale)
+  const point = state.stage.getPointerPosition()
+  return zoomToPointTween(state, scale, point)
 }
 
-function zoomToPointTween(canvas: Canvas, scale, point):Promise<any>{
-  console.log('zoomToCenterTween: ', canvas, scale, point)
-  return new Promise((resolve, reject)=>{
+function zoomToPointTween(state: State, scale, point):Promise<any>{
+  console.log('zoomToCenterTween: ', state, scale, point)
+  return new Promise((resolve)=>{
     console.log('scale:', scale)
-    const tweenAttrs = zoomToPointAttributes(canvas, scale, point)
+    const tweenAttrs = zoomToPointAttributes(state, scale, point)
     // exit when nothing to do (curr state matches the attributes)
-    const nothingToDo = ( scale === canvas.rootLayer.scaleX()
-      || tweenAttrs.x === canvas.rootLayer.x()
-      || tweenAttrs.y === canvas.rootLayer.y() )
-    if(nothingToDo){
-      reject()
-    } // if
-    else{
+    const nothingToDo = ( scale === state.rootLayer.scaleX()
+      && tweenAttrs.x === state.rootLayer.x()
+      && tweenAttrs.y === state.rootLayer.y() )
+    if(!nothingToDo){
       /* 
         freeze state and destroy prior animation
         !!! do not use finish() here, it'll cause adoptation of prior tween state !!
         at least onFinish will be fired because after pause and destroy the tween is getting started again
       */
-      if(canvas.tween){
-        canvas.tween.pause().destroy() 
+      if(state.tween){
+        state.tween.pause().destroy() 
       }
-      canvas.tween = new Konva.Tween( Object.assign({}, tweenAttrs, {
-        node: canvas.rootLayer,
-        duration: canvas.tweenDuration,
+      state.tween = new Konva.Tween( Object.assign({}, tweenAttrs, {
+        node: state.rootLayer,
+        duration: state.tweenDuration,
         easing: Konva.Easings.EaseOut,
         onFinish: resolve
       }))
-      canvas.tween.play()
+      state.tween.play()
     } // else
   })
 }
 
-function fitInViewAttributes(canvas:Canvas){
+function fitInViewAttributes(state:State){
   const imgScaled = {
-    width: canvas.image.width()*canvas.minScale,
-    height: canvas.image.height()*canvas.minScale
+    width: state.image.width()*state.minScale,
+    height: state.image.height()*state.minScale
   } // imgScaled
   const attributes = {
-    scaleX: canvas.minScale,
-    scaleY: canvas.minScale,
+    scaleX: state.minScale,
+    scaleY: state.minScale,
     x: 0,
     y: 0
   }
-  // center image horizontally/vertically
-  if(imgScaled.width < canvas.stage.width())
-    attributes.x = (canvas.stage.width()-imgScaled.width)/2
-  else
-    attributes.y = (canvas.stage.height()-imgScaled.height)/2
+  // center image horizontally/vertically 
+  if(imgScaled.width < state.stage.width())
+    attributes.x = (state.stage.width()-imgScaled.width)/2
+  if(imgScaled.height < state.stage.height())
+    attributes.y = (state.stage.height()-imgScaled.height)/2
   return attributes
 }
 
-export function fitInViewTween(canvas:Canvas):Promise<any> {
-  return new Promise((resolve, reject) =>{
-    const attrs = fitInViewAttributes(canvas)
-    const nothingToDo = ( attrs.x === canvas.rootLayer.x()
-      || attrs.y === canvas.rootLayer.y()
-      || attrs.scaleX == canvas.rootLayer.scaleX())
-    if(nothingToDo){
-      reject()
-    } else {
-      if(canvas.tween)
-        canvas.tween.pause().destroy()
-      canvas.tween = new Konva.Tween(Object.assign({}, attrs,{
-        node: canvas.rootLayer,
-        duration: canvas.tweenDuration,
+function fitInViewTween(state:State):Promise<any> {
+  return new Promise((resolve) =>{
+    const attrs = fitInViewAttributes(state)
+    const nothingToDo = ( attrs.x === state.rootLayer.x()
+      && attrs.y === state.rootLayer.y()
+      && attrs.scaleX == state.rootLayer.scaleX())
+    if(!nothingToDo){
+      if(state.tween)
+        state.tween.pause().destroy()
+      state.tween = new Konva.Tween(Object.assign({}, attrs,{
+        node: state.rootLayer,
+        duration: state.tweenDuration,
         easing: Konva.Easings.EaseOut,
         onFinish: resolve
       }))
-      canvas.tween.play()
+      state.tween.play()
     }
   }) // Promise
 } // fitInViewTween

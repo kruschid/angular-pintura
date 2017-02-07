@@ -21,6 +21,8 @@ export interface IPinturaConfig{
 interface IPinturaDirectiveScope extends angular.IScope{
   config: IPinturaConfig
   fitInView()
+  zoomIn()
+  zoomOut()
 }
 
 const directive = angular.module('kdPintura', [])
@@ -32,24 +34,23 @@ directive.directive('kdPintura', ($window) => ({
   },
   link: (scope:IPinturaDirectiveScope, element, attrs, ctrl, transcludeFn) => {
     const config:IPinturaConfig = scope.config ? scope.config : {}
-    const canvas = new NGP.Canvas()
-    element.append(canvas.stage.container())
+    const state = new NGP.State(syncConfig)
+    element.append(state.stage.container())
     // share scope with transcluded template
     transcludeFn(scope, (transcludedTemplate) =>
       element.append(transcludedTemplate)
     )
 
-    function syncConfig(){
+    function syncConfig(state:NGP.State){
       console.log('syncConfig')
       scope.$apply(()=>{
-        config.relativeScale = NGP.toRelativeScale(canvas)
-        console.log(config.relativeScale)
-        
+        config.relativeScale = NGP.toRelativeScale(state)
+        config.scale = state.rootLayer.scaleX()
       })
     }
 
     function onResize(){
-      canvas.resize({
+      NGP.resize(state, {
         width: element[0].clientWidth,
         height: element[0].clientHeight 
       })
@@ -57,35 +58,33 @@ directive.directive('kdPintura', ($window) => ({
 
     function changeImage(){
       if(config.src)
-        NGP.changeImage(canvas, config.src)
-        .then(fitInView)
+        NGP.changeImage(state, config.src)
+      else
+        console.log('angular-pintura: src should be a url')
     } // changeImage
 
-    function fitInView(){
-        NGP.fitInViewTween(canvas)
-        .then(syncConfig)
-    }
-
-    function changeRealtiveScale(){
-      if(typeof config.relativeScale === 'number')
-        NGP.zoomToCenterTween(canvas, config.relativeScale)
+    function changeRealtiveScale(relativeScale){
+      if(typeof relativeScale === 'number')
+        NGP.zoomToCenter(state, relativeScale)
     }
 
     function changeHotspots(){
       if(config.hotspots)
-        canvas.hotspotsGroup.removeChildren()
-        canvas.hotspotsGroup.add.apply(
-          canvas.hotspotsGroup, 
+        state.hotspotsGroup.removeChildren()
+        state.hotspotsGroup.add.apply(
+          state.hotspotsGroup, 
           config.hotspots
         )
     }
 
     function changeHotspotsVisbility(){
-      canvas.hotspotsGroup.visible(config.showHotspots)
-      canvas.stage.draw()
+      state.hotspotsGroup.visible(config.showHotspots)
+      state.stage.draw()
     }
 
-    scope.fitInView = fitInView
+    scope.fitInView = () => NGP.fitInView(state)
+    scope.zoomIn = () => NGP.zoomIn(state)
+    scope.zoomOut = () =>  NGP.zoomOut(state)
     scope.$watch('config.src', changeImage)
     scope.$watch('config.relativeScale', changeRealtiveScale)
     scope.$watch('config.hotspots', changeHotspots)
