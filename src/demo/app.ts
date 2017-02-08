@@ -1,16 +1,16 @@
 import * as angular from 'angular'
 import * as Konva from 'konva'
-import {IPinturaConfig} from '../src/ng-directive'
+import {IPinturaConfig} from '../angular-bindings'
 
-require('./app.sass')
-require('../src/ng-directive.ts')
+import './app.sass'
+import '../angular-bindings.ts'
 
 const app = angular.module('app', ['kdPintura'])
 
 app.controller('PinturaCtrl', ($scope) => {
   let config:IPinturaConfig = {
     // src: 'images/img1.jpg' 
-    src: require('file-loader!./images/img1.jpg'),
+    src: require('file-loader!../../images/img1.jpg'),
     showHotspots: true,
     hotspots: [
       new Konva.Ellipse({
@@ -27,11 +27,11 @@ app.controller('PinturaCtrl', ($scope) => {
   $scope.config = config
 
   $scope.setURLSource1 = () =>
-    $scope.config.src = require('file-loader!./images/img1.jpg')
+    $scope.config.src = require('file-loader!../../images/img1.jpg')
   
   $scope.setURLSource2 = () =>
-    $scope.config.src = require('file-loader!./images/img2.jpg')
+    $scope.config.src = require('file-loader!../../images/img2.jpg')
   
   $scope.setSmallImage = () =>
-    $scope.config.src = require('file-loader!./images/trier.png')
+    $scope.config.src = require('file-loader!../../images/trier.png')
 })

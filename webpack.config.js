@@ -11,10 +11,13 @@ module.exports = {
     contentBase: './build',
     port: 8080,
   },
-  entry: './demo/app.ts',
+  entry: {
+    //vendor: ['angular', 'konva'],
+    demo: './src/demo/app.ts'
+  },
   output: {
     path:  path.join(__dirname, 'build'),
-    filename: 'bundle.js' 
+    filename: '[name].bundle.js'
   },
   resolve: {
     extensions: ['.ts','.js']
@@ -36,13 +39,23 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'demo/app.pug'
+      template: 'src/demo/app.pug',
+      // chunks: ['lib', 'demo'],
+      // chunksSortMode: (chunk1,chunk2) => {
+      //   var orders = ['vendor', 'demo']
+      //   var order1 = orders.indexOf(chunk1.names[0])
+      //   var order2 = orders.indexOf(chunk2.names[0])
+      //   if (order1 > order2) {
+      //     return 1
+      //   } else if (order1 < order2) {
+      //     return -1
+      //   } else {
+      //     return 0
+      //   }
+      // }
     }),
     // new LiveReloadPlugin({
     //   appendScriptTag: true
     // })
   ], // plugins
-  // externals: {
-  //   'angular': 'angular',
-  // }
 }

@@ -1,8 +1,24 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "es2015",
         "target": "es6",
+        "moduleResolution": "node",
+        "declaration": true,
+        "removeComments": true,
         "noImplicitAny": false,
-        "sourceMap": true
-    }
+        "sourceMap": false,
+        "outDir": "dist"
+        // "noLib": true,
+        // "typeRoots": [
+        //     "node_modules/konva",
+        //     "angular"
+        // ]
+    },
+    "files" : [
+        "src/angular-bindings.ts",
+        "src/konva-pintura.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }

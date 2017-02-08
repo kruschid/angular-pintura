@@ -1,6 +1,6 @@
 import * as angular from 'angular'
 import * as Konva from 'konva'
-import * as NGP from './konva-plugin'
+import * as KDP from './konva-pintura'
 
 export interface IPinturaConfig{
   src?: string
@@ -34,23 +34,23 @@ directive.directive('kdPintura', ($window) => ({
   },
   link: (scope:IPinturaDirectiveScope, element, attrs, ctrl, transcludeFn) => {
     const config:IPinturaConfig = scope.config ? scope.config : {}
-    const state = new NGP.State(syncConfig)
+    const state = new KDP.State(syncConfig)
     element.append(state.stage.container())
     // share scope with transcluded template
     transcludeFn(scope, (transcludedTemplate) =>
       element.append(transcludedTemplate)
     )
 
-    function syncConfig(state:NGP.State){
+    function syncConfig(state:KDP.State){
       console.log('syncConfig')
       scope.$apply(()=>{
-        config.relativeScale = NGP.toRelativeScale(state)
+        config.relativeScale = KDP.toRelativeScale(state)
         config.scale = state.rootLayer.scaleX()
       })
     }
 
     function onResize(){
-      NGP.resize(state, {
+      KDP.resize(state, {
         width: element[0].clientWidth,
         height: element[0].clientHeight 
       })
@@ -58,14 +58,14 @@ directive.directive('kdPintura', ($window) => ({
 
     function changeImage(){
       if(config.src)
-        NGP.changeImage(state, config.src)
+        KDP.changeImage(state, config.src)
       else
         console.log('angular-pintura: src should be a url')
     } // changeImage
 
     function changeRealtiveScale(relativeScale){
       if(typeof relativeScale === 'number')
-        NGP.zoomToCenter(state, relativeScale)
+        KDP.zoomToCenter(state, relativeScale)
     }
 
     function changeHotspots(){
@@ -82,9 +82,9 @@ directive.directive('kdPintura', ($window) => ({
       state.stage.draw()
     }
 
-    scope.fitInView = () => NGP.fitInView(state)
-    scope.zoomIn = () => NGP.zoomIn(state)
-    scope.zoomOut = () =>  NGP.zoomOut(state)
+    scope.fitInView = () => KDP.fitInView(state)
+    scope.zoomIn = () => KDP.zoomIn(state)
+    scope.zoomOut = () =>  KDP.zoomOut(state)
     scope.$watch('config.src', changeImage)
     scope.$watch('config.relativeScale', changeRealtiveScale)
     scope.$watch('config.hotspots', changeHotspots)

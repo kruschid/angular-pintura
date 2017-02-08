@@ -1,5 +1,6 @@
 module = angular.module('ngPintura', [])
 
+
 class NGPImageLoader
   constructor: (@files = [], @loadedCb, @progressCb) ->
     @loaded = 0
