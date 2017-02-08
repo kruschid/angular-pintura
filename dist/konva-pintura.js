@@ -1,5 +1,6 @@
-import * as Konva from 'konva';
-export class State {
+"use strict";
+const Konva = require("konva");
+class State {
     constructor(notifier) {
         this.notifier = notifier;
         this.stage = new Konva.Stage({
@@ -28,24 +29,27 @@ export class State {
         this.notifier(this);
     }
 }
+exports.State = State;
 function fromRelativeScale(state, relativeScale) {
     const t = Math.max(Math.min(relativeScale, 1), 0);
     const b = state.minScale;
     const c = state.maxScale - state.minScale;
     return c * t * t + b;
 }
-export function toRelativeScale(state) {
+function toRelativeScale(state) {
     const b = state.minScale;
     const c = state.maxScale - state.minScale;
     const s = state.rootLayer.scaleX();
     return Math.sqrt(Math.abs((s - b) / c));
 }
-export function resize(state, s) {
+exports.toRelativeScale = toRelativeScale;
+function resize(state, s) {
     console.log('State: resizing to', s);
     state.stage.setSize(s);
     adjustScaleBounds(state);
 }
-export function changeImage(state, src) {
+exports.resize = resize;
+function changeImage(state, src) {
     return loadImage(state, src)
         .then((img) => {
         state.image.image(img);
@@ -58,23 +62,28 @@ export function changeImage(state, src) {
         }
     });
 }
-export function fitInView(state) {
+exports.changeImage = changeImage;
+function fitInView(state) {
     return fitInViewTween(state)
         .then(() => state.notify());
 }
-export function zoomToCenter(state, relativeScale) {
+exports.fitInView = fitInView;
+function zoomToCenter(state, relativeScale) {
     const scale = fromRelativeScale(state, relativeScale);
     return zoomToCenterTween(state, scale)
         .then(() => state.notify());
 }
-export function zoomIn(state) {
+exports.zoomToCenter = zoomToCenter;
+function zoomIn(state) {
     const relScale = toRelativeScale(state) + state.zoomStep;
     return zoomToCenter(state, relScale);
 }
-export function zoomOut(state) {
+exports.zoomIn = zoomIn;
+function zoomOut(state) {
     const relScale = toRelativeScale(state) - state.zoomStep;
     return zoomToCenter(state, relScale);
 }
+exports.zoomOut = zoomOut;
 function loadImage(state, src) {
     console.log('State: loading image', src);
     return new Promise((resolve) => {

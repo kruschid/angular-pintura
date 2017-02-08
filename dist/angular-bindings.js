@@ -1,5 +1,6 @@
-import * as angular from 'angular';
-import * as KDP from './konva-pintura';
+"use strict";
+const angular = require("angular");
+const KDP = require("./konva-pintura");
 const directive = angular.module('kdPintura', []);
 directive.directive('kdPintura', ($window) => ({
     transclude: true,
@@ -53,4 +54,4 @@ directive.directive('kdPintura', ($window) => ({
         onResize();
     }
 }));
-export const KDPintura = directive;
+exports.KDPintura = directive;
