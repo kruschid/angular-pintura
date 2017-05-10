@@ -69,12 +69,13 @@ directive.directive('kdPintura', ($window) => ({
     }
 
     function changeHotspots(){
-      if(config.hotspots)
+      if(config.hotspots && config.hotspots.length) {
         state.hotspotsGroup.removeChildren()
         state.hotspotsGroup.add.apply(
           state.hotspotsGroup, 
           config.hotspots
         )
+      }
     }
 
     function changeHotspotsVisbility(){
