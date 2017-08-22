@@ -318,7 +318,7 @@ class NGPImage
 # creates and shares paperjs scope with child directives
 # creates canvas
 ###
-module.directive 'ngPintura', ($window) ->
+module.directive 'ngPintura', ['$window', ($window) ->
   directive = 
     transclude: true
     scope:
@@ -474,3 +474,4 @@ module.directive 'ngPintura', ($window) ->
       ngPintura.image.node.on(ngPintura.image.LOADED, imageLoad)
       # append transcluded template and pass scope to it
       transcludeFn( scope, (clonedTranscludedTemplate) -> element.append(clonedTranscludedTemplate) )
+]
