@@ -27,7 +27,7 @@ interface IPinturaDirectiveScope extends angular.IScope{
 
 const directive = angular.module('kdPintura', [])
 
-directive.directive('kdPintura', ($window) => ({
+directive.directive('kdPintura', ['$window', ($window) => ({
   transclude: true,
   scope:{
     config: '=kdpConfig'
@@ -92,6 +92,6 @@ directive.directive('kdPintura', ($window) => ({
     scope.$watch('config.showHotspots', changeHotspotsVisbility)
     onResize()
   } 
-}))
+})])
 
 export const KDPintura = directive
