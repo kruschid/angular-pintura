@@ -67,6 +67,7 @@ export function changeImage(state:State, src):Promise<any>{
         return fitInView(state)
       }else{
         state.notify()
+        state.stage.draw();
       }
     })
 }
